@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29123.88
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bangazon-Workforce-Management", "Bangazon-Workforce-Management.csproj", "{245B8738-9838-4319-B250-2BF5CA950D60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bangazon-Workforce-Management", "Bangazon-Workforce-Management.csproj", "{444CB93F-C521-44EC-924D-B71F2F318F12}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{245B8738-9838-4319-B250-2BF5CA950D60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{245B8738-9838-4319-B250-2BF5CA950D60}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{245B8738-9838-4319-B250-2BF5CA950D60}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{245B8738-9838-4319-B250-2BF5CA950D60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{444CB93F-C521-44EC-924D-B71F2F318F12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{444CB93F-C521-44EC-924D-B71F2F318F12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{444CB93F-C521-44EC-924D-B71F2F318F12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{444CB93F-C521-44EC-924D-B71F2F318F12}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {5FA64B11-7BCC-4F12-B50F-8044D0F07DB4}
+		SolutionGuid = {322BBEF3-DF0F-4E78-A68F-855254713C75}
 	EndGlobalSection
 EndGlobal
