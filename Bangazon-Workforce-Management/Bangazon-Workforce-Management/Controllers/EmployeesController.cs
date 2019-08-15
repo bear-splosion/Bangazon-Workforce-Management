@@ -60,10 +60,40 @@ namespace Bangazon_Workforce_Management.Controllers
             return View(employees);
         }
 
+
         // GET: Employees/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            Employee employee = null;
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT Id, FirstName, LastName, DepartmentId, IsSupervisor
+                        FROM Employee
+                        WHERE Id = @id
+                    ";
+
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    if (reader.Read())
+                    {
+                        employee = new Employee()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor"))
+                        };
+                    }
+                }
+            }
+
+            return View(employee);
         }
 
         // GET: Employees/Create
