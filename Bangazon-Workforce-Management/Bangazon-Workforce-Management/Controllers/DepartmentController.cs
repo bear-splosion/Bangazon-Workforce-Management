@@ -38,7 +38,7 @@ namespace Bangazon_Workforce_Management.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"SELECT d.Id, d.[Name], d.Budget, COUNT(e.Id) AS Employees 
-                                            FROM Department d JOIN Employee e ON d.Id = e.DepartmentId 
+                                            FROM Department d LEFT JOIN Employee e ON d.Id = e.DepartmentId 
                                                 GROUP BY d.Id, d.[Name], d.Budget, e.DepartmentId";
 
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -73,7 +73,7 @@ namespace Bangazon_Workforce_Management.Controllers
                 {
                     cmd.CommandText = @"
                         SELECT d.Id, d.[Name], d.Budget, COUNT(e.Id) AS Employees 
-                            FROM Department d JOIN Employee e ON d.Id = e.DepartmentId 
+                            FROM Department d LEFT JOIN Employee e ON d.Id = e.DepartmentId 
                             WHERE d.Id = @id
                             GROUP BY d.Id, d.[Name], d.Budget, e.DepartmentId
                         ";
@@ -96,8 +96,7 @@ namespace Bangazon_Workforce_Management.Controllers
         // GET: Department/Create
         public ActionResult Create()
         {
-            var ViewModel = new DepartmentCreateViewModel
-                (_config.GetConnectionString("DefaultConnection"));
+            var ViewModel = new DepartmentCreateViewModel();
             return View(ViewModel);
         }
 
@@ -124,7 +123,7 @@ namespace Bangazon_Workforce_Management.Controllers
                            @budget
                        )
                       ";
-                        cmd.Parameters.AddWithValue("@Name", department.Name);
+                        cmd.Parameters.AddWithValue("@name", department.Name);
                         cmd.Parameters.AddWithValue("@budget", department.Budget);
 
                         //now, Execute command
