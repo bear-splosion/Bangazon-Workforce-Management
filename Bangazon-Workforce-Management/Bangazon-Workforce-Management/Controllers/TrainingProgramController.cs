@@ -40,6 +40,7 @@ namespace Bangazon_Workforce_Management.Controllers
                     cmd.CommandText = @"
                         SELECT Id, Name, StartDate, EndDate, MaxAttendees
                         FROM TrainingProgram
+                        WHERE StartDate > GetDate();
                     ";
 
                     SqlDataReader reader = cmd.ExecuteReader();

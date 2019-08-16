@@ -83,8 +83,8 @@ namespace Bangazon_Workforce_Management.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT Id, FirstName, LastName, DepartmentId, IsSupervisor
-                        FROM Employee
+                        SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor, c.
+                        FROM Employee e
                         WHERE Id = @id
                     ";
 
