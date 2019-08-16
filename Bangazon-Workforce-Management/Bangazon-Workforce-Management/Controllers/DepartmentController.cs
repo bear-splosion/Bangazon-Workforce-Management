@@ -36,7 +36,9 @@ namespace Bangazon_Workforce_Management.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT Id, Name, Budget FROM Department";
+                    cmd.CommandText = @"SELECT d.Id, d.[Name], d.Budget, COUNT(e.Id) AS Employees 
+                                            FROM Department d JOIN Employee e ON d.Id = e.DepartmentId 
+                                                GROUP BY d.Id, d.[Name], d.Budget, e.DepartmentId";
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -46,8 +48,11 @@ namespace Bangazon_Workforce_Management.Controllers
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
-                            Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
+                            Budget = reader.GetInt32(reader.GetOrdinal("Budget")),
+                            Employees = reader.GetInt32(reader.GetOrdinal("Employees"))
                         });
+
+                        
                     }
                     reader.Close();
                 }
@@ -66,9 +71,11 @@ namespace Bangazon_Workforce_Management.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT Id,[Name], Budget 
-                        FROM Department 
-                        WHERE Id = @id";
+                        SELECT d.Id, d.[Name], d.Budget, COUNT(e.Id) AS Employees 
+                            FROM Department d JOIN Employee e ON d.Id = e.DepartmentId 
+                            WHERE d.Id = @id
+                            GROUP BY d.Id, d.[Name], d.Budget, e.DepartmentId
+                        ";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
                     if (reader.Read())
@@ -77,7 +84,8 @@ namespace Bangazon_Workforce_Management.Controllers
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
-                            Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
+                            Budget = reader.GetInt32(reader.GetOrdinal("Budget")),
+                            Employees = reader.GetInt32(reader.GetOrdinal("Employees"))
                         };
                     }
                 }
