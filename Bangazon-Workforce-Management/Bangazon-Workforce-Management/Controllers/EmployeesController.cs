@@ -83,9 +83,13 @@ namespace Bangazon_Workforce_Management.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor, c.
-                        FROM Employee e
-                        WHERE Id = @id
+                    SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor, ce.ComputerId, c.Make, c.Manufacturer, c.Id, d.Name AS Department, et.TrainingProgramId, et.EmployeeId, t.Name
+                    FROM Employee e
+                    LEFT JOIN ComputerEmployee ce ON ce.EmployeeId = e.Id
+                    LEFT JOIN Computer c ON c.Id = ce.ComputerId
+                    LEFT JOIN Department d ON d.Id = e.DepartmentId
+                    LEFT JOIN EmployeeTraining et ON et.EmployeeId = e.Id
+                    LEFT JOIN TrainingProgram t ON t.Id = et.TrainingProgramId
                     ";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
@@ -93,13 +97,22 @@ namespace Bangazon_Workforce_Management.Controllers
 
                     if (reader.Read())
                     {
+
                         employee = new Employee()
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor"))
+                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
+                            Department = new Department()
+                            {
+                                Name = reader.GetString(reader.GetOrdinal("DepartmentName"))
+                            },
+                            Computer = new Computer()
+                            {
+                                Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")
+                            }
                         };
                     }
                 }
