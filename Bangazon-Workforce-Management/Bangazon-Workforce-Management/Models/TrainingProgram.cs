@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Bangazon_Workforce_Management
+namespace Bangazon_Workforce_Management.Models
 {
     public class TrainingProgram
     {
