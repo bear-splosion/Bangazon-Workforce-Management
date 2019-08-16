@@ -27,38 +27,49 @@ namespace Bangazon_Workforce_Management.Controllers
                 return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
             }
         }
-        // GET: EMPLOYEES
+        // GET: Employees
         public ActionResult Index()
         {
-            var employees = new List<Employee>();
+            List<EmployeeDisplayViewModel> models = new List<EmployeeDisplayViewModel>();
+
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT Id, FirstName, LastName, DepartmentId, IsSupervisor
-                        FROM Employee
-                    ";
+                        SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor, d.Name, d.Id As DeptId, d.Budget
+                        FROM Employee e
+                        LEFT JOIN Department d ON d.Id = e.DepartmentId
+                        ";
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     while (reader.Read())
                     {
-                        employees.Add(new Employee()
+                        var viewModel = new EmployeeDisplayViewModel();
+                        var employee = new Employee()
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor"))
-                        });
+                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
+                        };
+                        var department = new Department()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("DeptId")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            Budget = reader.GetInt32(reader.GetOrdinal("Budget")),
+                        };
+                        viewModel.Employee = employee;
+                        viewModel.Department = department;
+                        models.Add(viewModel);
                     }
                     reader.Close();
                 }
             }
-
-            return View(employees);
+            return View(models);
         }
 
 
