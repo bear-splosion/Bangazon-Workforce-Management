@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Bangazon_Workforce_Management.Models;
+using Bangazon_Workforce_Management.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -37,7 +38,7 @@ namespace Bangazon_Workforce_Management.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"SELECT d.Id, d.[Name], d.Budget, COUNT(e.Id) AS Employees 
-                                            FROM Department d JOIN Employee e ON d.Id = e.DepartmentId 
+                                            FROM Department d LEFT JOIN Employee e ON d.Id = e.DepartmentId 
                                                 GROUP BY d.Id, d.[Name], d.Budget, e.DepartmentId";
 
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -72,7 +73,7 @@ namespace Bangazon_Workforce_Management.Controllers
                 {
                     cmd.CommandText = @"
                         SELECT d.Id, d.[Name], d.Budget, COUNT(e.Id) AS Employees 
-                            FROM Department d JOIN Employee e ON d.Id = e.DepartmentId 
+                            FROM Department d LEFT JOIN Employee e ON d.Id = e.DepartmentId 
                             WHERE d.Id = @id
                             GROUP BY d.Id, d.[Name], d.Budget, e.DepartmentId
                         ";
@@ -93,19 +94,43 @@ namespace Bangazon_Workforce_Management.Controllers
             return View(department);
         }
         // GET: Department/Create
+        [HttpGet]
         public ActionResult Create()
         {
-            return View();
+            var ViewModel = new DepartmentCreateViewModel(_config.GetConnectionString("DefaultConnection"));
+            return View(ViewModel);
         }
 
         // POST: Department/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Department department)
         {
             try
             {
-                // TODO: Add insert logic here
+
+                //now, write it to the DB
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
+                       INSERT INTO Department (
+                          Name,
+                          Budget
+                      ) VALUES (
+                           @name,
+                           @budget
+                       )
+                      ";
+                        cmd.Parameters.AddWithValue("@name", department.Name);
+                        cmd.Parameters.AddWithValue("@budget", department.Budget);
+
+                        //now, Execute command
+                        cmd.ExecuteNonQuery();
+                    }
+                }
 
                 return RedirectToAction(nameof(Index));
             }
