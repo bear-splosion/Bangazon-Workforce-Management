@@ -10,11 +10,12 @@ using Microsoft.Extensions.Configuration;
 
 namespace Bangazon_Workforce_Management.Controllers
 {
-    public class DepartmentController : Controller
+    public class ComputerController : Controller
     {
+
         private readonly IConfiguration _config;
 
-        public DepartmentController(IConfiguration config)
+        public ComputerController(IConfiguration config)
         {
             _config = config;
         }
@@ -26,72 +27,50 @@ namespace Bangazon_Workforce_Management.Controllers
                 return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
             }
         }
-
-        // GET: Department
+        // GET: Computer
         public ActionResult Index()
         {
-            
-            var departments = new List<Department>();
+            var computers = new List<Computer>();
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
+                using(SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT Id, Name, Budget FROM Department";
-
+                    cmd.CommandText = @" SELECT Id, PurchaseDate,DecomissionDate
+                    ,Make
+                    ,Manufacturer 
+                        FROM Computer";
                     SqlDataReader reader = cmd.ExecuteReader();
-
                     while(reader.Read())
                     {
-                        departments.Add(new Department()
+                        computers.Add(new Computer()
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
+                            Make = reader.GetString(reader.GetOrdinal("Make")),
+                            Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+                            DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate")),
+                            PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate"))
                         });
                     }
                     reader.Close();
                 }
             }
-            return View(departments);
+                return View(computers);
         }
 
-        // GET: Department/Details/5
-        
+        // GET: Computer/Details/5
         public ActionResult Details(int id)
         {
-            Department department = null;
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"
-                        SELECT Id,[Name], Budget 
-                        FROM Department 
-                        WHERE Id = @id";
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    if (reader.Read())
-                    {
-                        department = new Department()
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
-                        };
-                    }
-                }
-            }
-            return View(department);
+            return View();
         }
-        // GET: Department/Create
+
+        // GET: Computer/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: Department/Create
+        // POST: Computer/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(IFormCollection collection)
@@ -108,13 +87,13 @@ namespace Bangazon_Workforce_Management.Controllers
             }
         }
 
-        // GET: Department/Edit/5
+        // GET: Computer/Edit/5
         public ActionResult Edit(int id)
         {
             return View();
         }
 
-        // POST: Department/Edit/5
+        // POST: Computer/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, IFormCollection collection)
@@ -131,13 +110,13 @@ namespace Bangazon_Workforce_Management.Controllers
             }
         }
 
-        // GET: Department/Delete/5
+        // GET: Computer/Delete/5
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: Department/Delete/5
+        // POST: Computer/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
