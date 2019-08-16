@@ -72,8 +72,10 @@ namespace Bangazon_Workforce_Management.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT Id, FirstName, LastName, DepartmentId, IsSupervisor
-                        FROM Employee
+                        SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor, d.[Name]
+                        FROM Employee e
+                        JOIN Department d
+                        ON e.DepartmentId = d.Id
                         WHERE Id = @id
                     ";
 
@@ -88,7 +90,8 @@ namespace Bangazon_Workforce_Management.Controllers
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor"))
+                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
+                            Name = reader.GetString(reader.GetOrdinal("Name"))
                         };
                     }
                 }

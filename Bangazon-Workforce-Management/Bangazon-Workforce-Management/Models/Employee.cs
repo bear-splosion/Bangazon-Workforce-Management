@@ -20,6 +20,10 @@ namespace Bangazon_Workforce_Management.Models
         public int DepartmentId { get; set; }
 
         [Required]
+        [Display(Name = "Department Name")]
+        public string Name { get; set; }
+
+        [Required]
         [Display(Name = "Supervisor?")]
         public bool IsSupervisor { get; set; }
 
