@@ -93,16 +93,36 @@ namespace Bangazon_Workforce_Management.Controllers
         // GET: Computer/Create
         public ActionResult Create()
         {
-            return View();
-        }
 
+            return View();
+
+        }
         // POST: Computer/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Computer computer)
         {
             try
             {
+                using(SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using(SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
+                        INSERT INTO Computer(PurchaseDate
+                     ,DecomissionDate
+                        ,Make
+                        ,Manufacturer) VALUES (@purchaseDate, @decomissionDate, @make, @manufacturer')
+                            ";
+                        cmd.Parameters.AddWithValue("purchaseDate", computer.PurchaseDate);
+                        cmd.Parameters.AddWithValue("decomissionDate", computer.DecomissionDate);
+                        cmd.Parameters.AddWithValue("make", computer.PurchaseDate);
+                        cmd.Parameters.AddWithValue("make", computer.Make);
+                        cmd.Parameters.AddWithValue("manufacturer", computer.Manufacturer);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
                 // TODO: Add insert logic here
 
                 return RedirectToAction(nameof(Index));
