@@ -87,8 +87,12 @@ namespace Bangazon_Workforce_Management.Controllers
         // GET: Department/Create
         public ActionResult Create()
         {
-            return View();
+            var ViewModel = new DepartmentCreateViewModel
+                (_config.GetConnectionString("DefaultConnection"));
+            return View(ViewModel);
         }
+
+
 
         // POST: Department/Create
         [HttpPost]
