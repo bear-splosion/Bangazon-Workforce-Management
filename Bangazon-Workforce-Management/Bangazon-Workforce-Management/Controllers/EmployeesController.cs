@@ -142,43 +142,63 @@ namespace Bangazon_Workforce_Management.Controllers
             }
         }
 
-        // GET: Employees/Delete/5
+        // GET: Instructors/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
-        }
-
-        // POST: Employees/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            Employee employee = GetOneEmployee(id);
-
+            //use GetSingleInstructor to get the Instructor you want to delete
+            Employee employee = GetSingleEmployee(id);
+            //pass that instructor into View()
             return View(employee);
         }
-        private Employee GetOneEmployee(int id)
-        {
-            Employee employee = null;
 
+        // POST: Instructors/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteEmployee(int id)
+        {
+            try
+            {
+                // TODO: Add delete logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"DELETE FROM Employee
+                                                WHERE Id = @id";
+                        cmd.Parameters.AddWithValue("@id", id);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        private Employee GetSingleEmployee(int id)
+        {
             using (SqlConnection conn = Connection)
             {
+                Employee employee = null;
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT Id, FirstName, LastName, DepartmentId, IsSupervisor
+                        SELECT Id, FirstName, LastName, DepartmentId, IsSupervisor, CohortId
                         FROM Employee
-                        WHERE Id
-                        ";
+                        WHERE Id = @id
+                    ";
 
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
-
-
-                    while (reader.Read())
+                    if (reader.Read())
                     {
-                        employee = new Employee
+                        employee = new Employee()
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
@@ -187,12 +207,9 @@ namespace Bangazon_Workforce_Management.Controllers
                             IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor"))
                         };
                     }
-
-                    reader.Close();
                 }
+                return employee;
             }
-
-            return (employee);
         }
     }
 }
