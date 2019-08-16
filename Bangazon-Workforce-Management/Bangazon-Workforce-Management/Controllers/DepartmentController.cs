@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Bangazon_Workforce_Management.Models;
+using Bangazon_Workforce_Management.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -95,7 +96,9 @@ namespace Bangazon_Workforce_Management.Controllers
         // GET: Department/Create
         public ActionResult Create()
         {
-            return View();
+            var ViewModel = new DepartmentCreateViewModel
+                (_config.GetConnectionString("DefaultConnection"));
+            return View(ViewModel);
         }
 
         // POST: Department/Create
