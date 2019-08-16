@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace BangazonAPI.Models
+namespace Bangazon_Workforce_Management.Models
 {
     public class Employee
     {
