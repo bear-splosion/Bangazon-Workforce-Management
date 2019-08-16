@@ -29,7 +29,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Employee.DepartmentId" class="control-label"></label>
-                <input asp-for="Employee.DepartmentId" class="form-control" />
+                <select asp-for="Employee.DepartmentId" asp-items="@Model.Departments" class="form-control"></select>
                 <span asp-validation-for="Employee.DepartmentId" class="text-danger"></span>
             </div>
             <div class="form-group">
