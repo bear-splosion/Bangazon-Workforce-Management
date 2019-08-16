@@ -5,6 +5,7 @@ namespace BangazonAPI.Models
 {
     public class Department
     {
+        [Display(Name = "Cohort Id")]
         public int Id { get; set; }
 
         [Required]
@@ -12,5 +13,6 @@ namespace BangazonAPI.Models
 
         [Required]
         public int Budget { get; set; }
+
     }
 }

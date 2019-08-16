@@ -56,11 +56,34 @@ namespace Bangazon_Workforce_Management.Controllers
         }
 
         // GET: Department/Details/5
+        
         public ActionResult Details(int id)
         {
-            return View();
+            Department department = null;
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT Id,[Name], Budget 
+                        FROM Department 
+                        WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    if (reader.Read())
+                    {
+                        department = new Department()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
+                        };
+                    }
+                }
+            }
+            return View(department);
         }
-
         // GET: Department/Create
         public ActionResult Create()
         {
