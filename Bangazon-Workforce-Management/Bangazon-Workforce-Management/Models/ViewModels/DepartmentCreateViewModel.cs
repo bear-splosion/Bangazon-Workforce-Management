@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,6 +14,8 @@ namespace Bangazon_Workforce_Management.Models.ViewModels
 
         private readonly string _connectionString;
 
+        public List<SelectListItem> Departments { get; }
+
         private SqlConnection Connection
         {
             get
@@ -22,50 +25,51 @@ namespace Bangazon_Workforce_Management.Models.ViewModels
         }
 
         //constructor
-        public StudentCreateViewModel() { }
+        public DepartmentCreateViewModel() { }
 
-        public StudentCreateViewModel(string connectionString)
+        public DepartmentCreateViewModel(string connectionString)
         {
             _connectionString = connectionString;
 
-            Cohorts = GetAllCohorts()
-                .Select(cohort => new SelectListItem
+            Departments = GetAllDepartments()
+                .Select(department => new SelectListItem
                 {
-                    Text = cohort.Name,
-                    Value = cohort.Id.ToString()
+                    Text = department.Name,
+                    Value = department.Id.ToString()
                 })
                 .ToList();
-            Cohorts.Insert(0, new SelectListItem
+            Departments.Insert(0, new SelectListItem
             {
-                Text = "Choose cohort...",
+                Text = "Choose department...",
                 Value = "0"
             });
         }
 
-        private List<Cohort> GetAllCohorts()
+        private List<Department> GetAllDepartments()
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT Id, Name FROM Cohort";
+                    cmd.CommandText = "SELECT Id, Name, Budget FROM Department";
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    //below, use while for mult cohorts/whatever and if in place of while if you only want one thing
-                    List<Cohort> cohorts = new List<Cohort>();
+                    //below, use while for mult depts/whatever and if in place of while if you only want one thing
+                    List<Department> departments = new List<Department>();
                     while (reader.Read())
                     {
-                        cohorts.Add(new Cohort
+                        departments.Add(new Department
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
+                            Budget = reader.GetInt32(reader.GetOrdinal("Budget")),
                         });
                     }
 
                     reader.Close();
 
-                    return cohorts;
+                    return departments;
                 }
             }
         }
