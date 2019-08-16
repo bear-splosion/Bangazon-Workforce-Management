@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using BangazonAPI.Models;
+using Bangazon_Workforce_Management.Models.ViewModels;
+using Bangazon_Workforce_Management.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -97,19 +98,48 @@ namespace Bangazon_Workforce_Management.Controllers
         }
 
         // GET: Employees/Create
+        [HttpGet]
         public ActionResult Create()
         {
-            return View();
+            var viewModel = new EmployeeCreateViewModel(_config.GetConnectionString("DefaultConnection"));
+            return View(viewModel);
         }
 
-        // POST: Employees/Create
+        // POST: Students/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Employee employee)
         {
             try
             {
-                // TODO: Add insert logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
+                            INSERT INTO Employee (
+                                FirstName, 
+                                LastName, 
+                                DepartmentId,
+                                IsSupervisor
+                            ) VALUES (
+                                @firstName,
+                                @lastName,
+                                @departmentId,
+                                @isSupervisor
+                            )
+                        ";
+
+                        cmd.Parameters.AddWithValue("@firstName", employee.FirstName);
+                        cmd.Parameters.AddWithValue("@lastName", employee.LastName);
+                        cmd.Parameters.AddWithValue("@departmentId", employee.DepartmentId);
+                        cmd.Parameters.AddWithValue("@isSupervisor", employee.IsSupervisor);
+
+                        cmd.ExecuteNonQuery();
+                    }
+                }
 
                 return RedirectToAction(nameof(Index));
             }
