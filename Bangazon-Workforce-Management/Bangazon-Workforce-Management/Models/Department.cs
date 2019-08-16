@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace BangazonAPI.Models
+namespace Bangazon_Workforce_Management.Models
 {
     public class Department
     {
-        [Display(Name = "Cohort Id")]
+        [Display(Name = "Department Id")]
         public int Id { get; set; }
 
         [Required]
@@ -13,6 +13,8 @@ namespace BangazonAPI.Models
 
         [Required]
         public int Budget { get; set; }
+
+        public int Employees { get; set; }
 
     }
 }
