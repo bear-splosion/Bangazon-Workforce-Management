@@ -8,13 +8,28 @@ namespace BangazonAPI.Models
         public int Id { get; set; }
 
         [Required]
+        [Display(Name="First Name")]
         public string FirstName { get; set; }
 
         [Required]
+        [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
-        public Department Department { get; set; }
+        [Required]
+        [Display(Name = "Department Id")]
+        public int DepartmentId { get; set; }
 
-        public bool isSupervisor { get; set; }
+        [Required]
+        [Display(Name = "Supervisor")]
+        public bool IsSupervisor { get; set; }
+
+        [Display(Name = "Full Name")]
+        public string FullName
+        {
+            get
+            {
+                return $"{FirstName} {LastName}";
+            }
+        }
     }
 }
