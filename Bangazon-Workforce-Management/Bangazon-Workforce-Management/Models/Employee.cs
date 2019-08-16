@@ -22,5 +22,14 @@ namespace BangazonAPI.Models
         [Required]
         [Display(Name = "Supervisor")]
         public bool IsSupervisor { get; set; }
+
+        [Display(Name = "Full Name")]
+        public string FullName
+        {
+            get
+            {
+                return $"{FirstName} {LastName}";
+            }
+        }
     }
 }
