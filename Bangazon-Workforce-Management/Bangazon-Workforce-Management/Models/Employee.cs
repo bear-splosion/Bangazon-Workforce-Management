@@ -19,6 +19,14 @@ namespace Bangazon_Workforce_Management.Models
         [Display(Name = "Department")]
         public int DepartmentId { get; set; }
 
+        public Department Department { get; set; }
+
+        public Computer Computer { get; set; }
+
+        public TrainingProgram TrainingProgram { get; set; }
+
+        public List<TrainingProgram> TrainingPrograms { get; set; }
+
         [Required]
         [Display(Name = "Supervisor")]
         public bool IsSupervisor { get; set; }

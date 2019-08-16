@@ -97,7 +97,12 @@ namespace Bangazon_Workforce_Management.Controllers
 
                     if (reader.Read())
                     {
-
+                        List<TrainingProgram> programs = new List<TrainingProgram>();
+                        programs.Add(new TrainingProgram()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("TrainingProgramId")),
+                            Name = reader.GetString(reader.GetOrdinal("Name"))
+                        });
                         employee = new Employee()
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
@@ -105,15 +110,19 @@ namespace Bangazon_Workforce_Management.Controllers
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                             IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
-                            Department = new Department()
-                            {
-                                Name = reader.GetString(reader.GetOrdinal("DepartmentName"))
-                            },
                             Computer = new Computer()
                             {
-                                Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")
-                            }
-                        };
+                                Make = reader.GetString(reader.GetOrdinal("Make")),
+                                Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+                                Id = reader.GetInt32(reader.GetOrdinal("ComputerId"))
+                            },
+                            Department = new Department()
+                            {
+                                Name = reader.GetString(reader.GetOrdinal("DepartmentName")),
+                                Id = reader.GetInt32(reader.GetOrdinal("DepartmentId"))
+                            },
+                            TrainingPrograms = programs
+                    };
                     }
                 }
             }
