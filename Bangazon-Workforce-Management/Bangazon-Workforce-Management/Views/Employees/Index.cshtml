@@ -1,4 +1,4 @@
-﻿@model IEnumerable<BangazonAPI.Models.Employee>
+﻿@model IEnumerable<Bangazon_Workforce_Management.Models.Employee>
 
 @{
     ViewData["Title"] = "Index";
@@ -43,7 +43,7 @@
                 @Html.DisplayFor(modelItem => item.DepartmentId)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Edit", "Edit", new { id=item.Id}) |
                 @Html.ActionLink("Details", "Details", new { id=item.Id }) |
                 @Html.ActionLink("Delete", "Delete", new { id=item.Id })
             </td>

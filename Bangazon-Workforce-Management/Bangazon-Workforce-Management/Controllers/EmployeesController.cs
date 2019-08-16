@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
-using BangazonAPI.Models;
+using Bangazon_Workforce_Management.Models;
+using Bangazon_Workforce_Management.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -122,19 +123,44 @@ namespace Bangazon_Workforce_Management.Controllers
         // GET: Employees/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            Employee employee = GetSingleEmployee(id);
+            List<Department> departments = GetAllDepartments();
+            var viewModel = new EmployeeEditViewModel(employee);
+            return View(viewModel);
         }
 
-        // POST: Employees/Edit/5
+        // POST: Instructors/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, EmployeeEditViewModel model)
         {
             try
             {
                 // TODO: Add update logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"UPDATE Employee
+                                            SET
+                                                FirstName = @firstName,
+                                                LastName = @lastName,
+                                                DepartmentId = @departmentId,
+                                                IsSupervisor = @isSupervisor
+                                            WHERE Id = @id";
+                        cmd.Parameters.AddWithValue("@firstName", model.Employee.FirstName);
+                        cmd.Parameters.AddWithValue("@lastName", model.Employee.LastName);
+                        cmd.Parameters.AddWithValue("@departmentId", model.Employee.DepartmentId);
+                        cmd.Parameters.AddWithValue("@isSupervisor", model.Employee.IsSupervisor);
+                        cmd.Parameters.AddWithValue("@id", id);
 
-                return RedirectToAction(nameof(Index));
+                        cmd.ExecuteNonQuery();
+
+                        return RedirectToAction(nameof(Index));
+
+                    }
+                }
             }
             catch
             {
@@ -209,6 +235,33 @@ namespace Bangazon_Workforce_Management.Controllers
                     }
                 }
                 return employee;
+            }
+        }
+
+        private List<Department> GetAllDepartments()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT Id, Name FROM Department";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Department> departments = new List<Department>();
+                    while (reader.Read())
+                    {
+                        departments.Add(new Department
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                        });
+                    }
+
+                    reader.Close();
+
+                    return departments;
+                }
             }
         }
     }

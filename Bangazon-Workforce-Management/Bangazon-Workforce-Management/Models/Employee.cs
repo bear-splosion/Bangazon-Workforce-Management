@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace BangazonAPI.Models
+namespace Bangazon_Workforce_Management.Models
 {
     public class Employee
     {
@@ -20,7 +20,7 @@ namespace BangazonAPI.Models
         public int DepartmentId { get; set; }
 
         [Required]
-        [Display(Name = "Supervisor")]
+        [Display(Name = "Supervisor?")]
         public bool IsSupervisor { get; set; }
 
         [Display(Name = "Full Name")]
