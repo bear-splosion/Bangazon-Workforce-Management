@@ -94,9 +94,10 @@ namespace Bangazon_Workforce_Management.Controllers
             return View(department);
         }
         // GET: Department/Create
+        [HttpGet]
         public ActionResult Create()
         {
-            var ViewModel = new DepartmentCreateViewModel();
+            var ViewModel = new DepartmentCreateViewModel(_config.GetConnectionString("DefaultConnection"));
             return View(ViewModel);
         }
 
@@ -117,7 +118,7 @@ namespace Bangazon_Workforce_Management.Controllers
                         cmd.CommandText = @"
                        INSERT INTO Department (
                           Name,
-                          Budget,
+                          Budget
                       ) VALUES (
                            @name,
                            @budget
