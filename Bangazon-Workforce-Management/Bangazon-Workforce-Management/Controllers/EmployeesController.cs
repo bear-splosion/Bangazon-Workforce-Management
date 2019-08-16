@@ -125,7 +125,7 @@ namespace Bangazon_Workforce_Management.Controllers
         {
             Employee employee = GetSingleEmployee(id);
             List<Department> departments = GetAllDepartments();
-            var viewModel = new EmployeeEditViewModel(employee);
+            var viewModel = new EmployeeEditViewModel(employee, departments);
             return View(viewModel);
         }
 
