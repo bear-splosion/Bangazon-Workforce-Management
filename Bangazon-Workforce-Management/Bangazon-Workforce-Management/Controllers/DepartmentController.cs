@@ -104,11 +104,33 @@ namespace Bangazon_Workforce_Management.Controllers
         // POST: Department/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Create(Department department)
         {
             try
             {
-                // TODO: Add insert logic here
+
+                //now, write it to the DB
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
+                       INSERT INTO Department (
+                          Name,
+                          Budget,
+                      ) VALUES (
+                           @name,
+                           @budget
+                       )
+                      ";
+                        cmd.Parameters.AddWithValue("@Name", department.Name);
+                        cmd.Parameters.AddWithValue("@budget", department.Budget);
+
+                        //now, Execute command
+                        cmd.ExecuteNonQuery();
+                    }
+                }
 
                 return RedirectToAction(nameof(Index));
             }
