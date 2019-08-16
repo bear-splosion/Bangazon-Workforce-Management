@@ -61,7 +61,33 @@ namespace Bangazon_Workforce_Management.Controllers
         // GET: Computer/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            Computer computer = null;
+            using(SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @" SELECT Id, PurchaseDate,DecomissionDate
+                    ,Make
+                    ,Manufacturer 
+                        FROM Computer
+                        WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    if(reader.Read())
+                    {
+                        computer = new Computer()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Make = reader.GetString(reader.GetOrdinal("Make")),
+                            Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+                            DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate")),
+                            PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate"))
+                        };
+                    }
+                }
+            }
+            return View(computer);
         }
 
         // GET: Computer/Create
