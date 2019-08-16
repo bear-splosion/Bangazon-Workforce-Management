@@ -153,16 +153,46 @@ namespace Bangazon_Workforce_Management.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
         {
-            try
-            {
-                // TODO: Add delete logic here
+            Employee employee = GetOneEmployee(id);
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
+            return View(employee);
+        }
+        private Employee GetOneEmployee(int id)
+        {
+            Employee employee = null;
+
+            using (SqlConnection conn = Connection)
             {
-                return View();
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT Id, FirstName, LastName, DepartmentId, IsSupervisor
+                        FROM Employee
+                        WHERE Id
+                        ";
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+
+
+                    while (reader.Read())
+                    {
+                        employee = new Employee
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor"))
+                        };
+                    }
+
+                    reader.Close();
+                }
             }
+
+            return (employee);
         }
     }
 }
