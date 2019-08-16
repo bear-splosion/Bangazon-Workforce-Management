@@ -1,4 +1,4 @@
-﻿@model BangazonAPI.Models.Department
+﻿@model Bangazon_Workforce_Management.Models.Department
 
 @{
     ViewData["Title"] = "Details";
@@ -27,6 +27,12 @@
         </dt>
         <dd>
             @Html.DisplayFor(model => model.Budget)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Employees)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Employees)
         </dd>
     </dl>
 </div>
