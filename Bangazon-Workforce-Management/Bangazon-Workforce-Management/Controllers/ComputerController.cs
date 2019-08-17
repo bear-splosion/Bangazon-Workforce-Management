@@ -178,5 +178,86 @@ namespace Bangazon_Workforce_Management.Controllers
                 return View();
             }
         }
+        // GET: Computers By Search
+        public ActionResult SearchComputers(IFormCollection search)
+        {
+            if (string.IsNullOrEmpty(search["SearchString"][0]))
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            List<Computer> computers = new List<Computer>();
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT Id, PurchaseDate, DecomissionDate, Make, Manufacturer 
+                                        FROM Computer
+                                        WHERE Make LIKE '%' + @search + '%'
+                                        OR Manufacturer LIKE '%' + @search + '%'";
+
+                    cmd.Parameters.AddWithValue("@search", search["SearchString"][0]);
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        Computer computer = new Computer
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
+                            Make = reader.GetString(reader.GetOrdinal("Make")),
+                            Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer"))
+                        };
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("DecomissionDate")))
+                        {
+                            computer.DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate"));
+                        }
+
+                        computers.Add(computer);
+                    }
+                    reader.Close();
+                }
+            }
+            return View(computers);
+        }
+        public Computer GetComputerById(int id)
+        {
+            Computer computer = null;
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT Id, DecomissionDate, PurchaseDate, Manufacturer, Make 
+                        FROM Computer
+                        WHERE Id = @id
+                    ";
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        computer = new Computer
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
+                            Make = reader.GetString(reader.GetOrdinal("Make")),
+                            Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer"))
+                        };
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("DecomissionDate")))
+                        {
+                            computer.DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate"));
+                        }
+                    }
+                    reader.Close();
+                }
+            }
+            return computer;
+        }
     }
 }
