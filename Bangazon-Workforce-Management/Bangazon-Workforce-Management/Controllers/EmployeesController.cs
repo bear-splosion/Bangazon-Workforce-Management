@@ -30,15 +30,16 @@ namespace Bangazon_Workforce_Management.Controllers
         // GET: Employees
         public ActionResult Index()
         {
-            List<EmployeeDisplayViewModel> models = new List<EmployeeDisplayViewModel>();
+            var employees = new List<Employee>();
 
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
+
                     cmd.CommandText = @"
-                        SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor, d.Name, d.Id As DeptId, d.Budget
+                        SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor, d.Name AS DepartmentName, d.Id As DeptId, d.Budget
                         FROM Employee e
                         LEFT JOIN Department d ON d.Id = e.DepartmentId
                         ";
@@ -47,29 +48,25 @@ namespace Bangazon_Workforce_Management.Controllers
 
                     while (reader.Read())
                     {
-                        var viewModel = new EmployeeDisplayViewModel();
-                        var employee = new Employee()
+                        employees.Add(new Employee()
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                             IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
-                        };
-                        var department = new Department()
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("DeptId")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            Budget = reader.GetInt32(reader.GetOrdinal("Budget")),
-                        };
-                        viewModel.Employee = employee;
-                        viewModel.Department = department;
-                        models.Add(viewModel);
+                            Department = new Department()
+                            {
+                                Name = reader.GetString(reader.GetOrdinal("DepartmentName")),
+                                Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
+                            }
+                        });
                     }
                     reader.Close();
                 }
             }
-            return View(models);
+            return View(employees);
         }
 
 
@@ -83,7 +80,7 @@ namespace Bangazon_Workforce_Management.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                    SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor, ce.ComputerId, c.Make, c.Manufacturer, c.Id, d.Name AS Department, et.TrainingProgramId, et.EmployeeId, t.Name
+                    SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor, ce.ComputerId, c.Make, c.Manufacturer, c.Id, d.Name AS DepartmentName, et.TrainingProgramId, et.EmployeeId, t.Name
                     FROM Employee e
                     LEFT JOIN ComputerEmployee ce ON ce.EmployeeId = e.Id
                     LEFT JOIN Computer c ON c.Id = ce.ComputerId
@@ -98,11 +95,7 @@ namespace Bangazon_Workforce_Management.Controllers
                     if (reader.Read())
                     {
                         List<TrainingProgram> programs = new List<TrainingProgram>();
-                        programs.Add(new TrainingProgram()
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("TrainingProgramId")),
-                            Name = reader.GetString(reader.GetOrdinal("Name"))
-                        });
+
                         employee = new Employee()
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
@@ -120,8 +113,7 @@ namespace Bangazon_Workforce_Management.Controllers
                             {
                                 Name = reader.GetString(reader.GetOrdinal("DepartmentName")),
                                 Id = reader.GetInt32(reader.GetOrdinal("DepartmentId"))
-                            },
-                            TrainingPrograms = programs
+                            }
                     };
                     }
                 }

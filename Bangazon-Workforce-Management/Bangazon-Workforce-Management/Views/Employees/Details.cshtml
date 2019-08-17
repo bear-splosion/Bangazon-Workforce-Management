@@ -1,4 +1,4 @@
-﻿@model Bangazon_Workforce_Management.Models.ViewModels.EmployeeDisplayViewModel
+﻿@model Bangazon_Workforce_Management.Models.Employee
 
 @{
     ViewData["Title"] = "Details";
@@ -11,10 +11,10 @@
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.Employee.FullName)
+            @Html.DisplayNameFor(model => model.FullName)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Employee.FullName)
+            @Html.DisplayFor(model => model.FullName)
         </dd>
         <dt>
             Department
@@ -45,9 +45,9 @@
             @Html.DisplayFor(model => model.Computer.Make)
         </dd>
     </dl>
-    <h4>Training Programs</h4>
-    <hr />
-    <table class="table">
+    @*<h4>Training Programs</h4>
+    <hr />*@
+    @*<table class="table">
         <thead>
             <tr>
                 <th>
@@ -64,8 +64,8 @@
                 </th>
                 <th></th>
             </tr>
-        </thead>
-        <tbody>
+        </thead>*@
+        @*<tbody>
             @foreach (var item in Model.TrainingPrograms)
             {
                 <tr>
@@ -83,10 +83,10 @@
                     </td>
                 </tr>
             }
-        </tbody>
-    </table>
+        </tbody>*@
+    @*</table>*@
 </div>
 <div>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.Employee.Id }) |
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
     <a asp-action="Index">Back to List</a>
 </div>
