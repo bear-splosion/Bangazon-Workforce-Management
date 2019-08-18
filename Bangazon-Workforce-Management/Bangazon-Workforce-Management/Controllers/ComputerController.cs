@@ -195,10 +195,11 @@ namespace Bangazon_Workforce_Management.Controllers
         // GET: Computers By Search
         public ActionResult Search(IFormCollection input)
         {
-            if (input != null)
+            if (input == null)
             {
                 return RedirectToAction(nameof(Index));
             }
+
             List<Computer> computers = new List<Computer>();
             using (SqlConnection conn = Connection)
             {
@@ -210,7 +211,8 @@ namespace Bangazon_Workforce_Management.Controllers
                                         WHERE Id LIKE '%' + @input + '%'
                                         OR Make LIKE '%' + @input + '%'
                                         OR Manufacturer LIKE '%' + @input + '%'";
-                    cmd.Parameters.AddWithValue("@input", input);
+
+                    cmd.Parameters.AddWithValue("@input", input["Search"][0]);
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -235,6 +237,45 @@ namespace Bangazon_Workforce_Management.Controllers
                 }
             }
             return View(computers);
+        }
+        public Computer GetSearchResults(int id)
+        {
+            Computer computer = null;
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"
+                        SELECT Id, PurchaseDate, DecomissionDate, Make, Manufacturer 
+                        FROM Computer
+                        WHERE Id = @id
+                    ";
+                        cmd.Parameters.AddWithValue("@id", id);
+
+                        SqlDataReader reader = cmd.ExecuteReader();
+
+                        while (reader.Read())
+                        {
+                            computer = new Computer
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
+                                Make = reader.GetString(reader.GetOrdinal("Make")),
+                                Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer"))
+                            };
+
+                            if (!reader.IsDBNull(reader.GetOrdinal("DecomissionDate")))
+                            {
+                                computer.DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate"));
+                            }
+                        }
+                        reader.Close();
+                    }
+                }
+            }
+            return computer;
         }
     }
 }
