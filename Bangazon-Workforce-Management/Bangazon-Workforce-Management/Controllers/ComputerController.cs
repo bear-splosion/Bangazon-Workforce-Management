@@ -91,9 +91,10 @@ namespace Bangazon_Workforce_Management.Controllers
         }
 
         // GET: Computer/Create
+        [HttpGet]
         public ActionResult Create()
         {
-            List<Employee> cohorts = GetAllEmployees();
+           
             var viewModel = new ComputerCreateViewModel(_config.GetConnectionString("DefaultConnection"));
             return View(viewModel);
 
@@ -105,10 +106,10 @@ namespace Bangazon_Workforce_Management.Controllers
         {
             try
             {
-                using(SqlConnection conn = Connection)
+                using (SqlConnection conn = Connection)
                 {
                     conn.Open();
-                    using(SqlCommand cmd = conn.CreateCommand())
+                    using (SqlCommand cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"
                         INSERT INTO Computer (
