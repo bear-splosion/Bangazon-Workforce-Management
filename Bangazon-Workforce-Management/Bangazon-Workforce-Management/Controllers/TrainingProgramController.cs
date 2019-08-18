@@ -105,8 +105,19 @@ namespace Bangazon_Workforce_Management.Controllers
         {
             try
             {
-                // TODO: Add update logic here
+                // TODO: Add delete logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"DELETE FROM TrainingProgram
+                                                WHERE Id = @id";
+                        cmd.Parameters.AddWithValue("@id", id);
 
+                        cmd.ExecuteNonQuery();
+                    }
+                }
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -124,17 +135,34 @@ namespace Bangazon_Workforce_Management.Controllers
         // POST: TrainingProgram/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id, TrainingProgram trainingProgram)
         {
             try
             {
-                // TODO: Add delete logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        // this sql command should remove all tables that the program relates to inside EmployeeTraining
+                        // then it will delete the actual program
+                        cmd.CommandText = @"
+                                            DELETE FROM TrainingProgram
+                                            WHERE StartDate > GetDate() AND Id = @id;
+                                            DELETE FROM EmployeeTraining
+                                            WHERE TrainingProgramId = @id;
+                                            ";
 
-                return RedirectToAction(nameof(Index));
+                        cmd.Parameters.AddWithValue("@id", id);
+
+                        cmd.ExecuteNonQuery();
+                        return RedirectToAction(nameof(Index));
+                    }
+                }
             }
             catch
             {
-                return View();
+                throw new Exception("An Error Occurred");
             }
         }
     }
