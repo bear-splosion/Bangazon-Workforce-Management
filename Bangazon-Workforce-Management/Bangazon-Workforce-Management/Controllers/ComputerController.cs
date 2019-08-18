@@ -119,7 +119,7 @@ namespace Bangazon_Workforce_Management.Controllers
                         VALUES (
                              @make, 
                              @manufacturer,
-                             @purchaseDate')
+                             @purchaseDate)
                          ";
                         
                         cmd.Parameters.AddWithValue("@make", computer.Make);
