@@ -212,7 +212,7 @@ namespace Bangazon_Workforce_Management.Controllers
                                         OR Make LIKE '%' + @input + '%'
                                         OR Manufacturer LIKE '%' + @input + '%'";
 
-                    cmd.Parameters.AddWithValue("@input", input["Search"][0]);
+                    cmd.Parameters.AddWithValue("@input", input);
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
