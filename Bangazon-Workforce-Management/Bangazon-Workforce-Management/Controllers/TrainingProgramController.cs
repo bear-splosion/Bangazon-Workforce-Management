@@ -105,14 +105,43 @@ namespace Bangazon_Workforce_Management.Controllers
         {
             try
             {
+                // TODO: Add update logic here
+
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+    public ActionResult Delete(int id)
+    {
+        //use GetSingleInstructor to get the Instructor you want to delete
+        TrainingProgram program = GetSingleTrainingProgram(id);
+        //pass that instructor into View()
+        return View(program);
+    }
+
+        // POST: Instructors/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteTrainingProgram(int id)
+        {
+            try
+            {
                 // TODO: Add delete logic here
                 using (SqlConnection conn = Connection)
                 {
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"DELETE FROM TrainingProgram
-                                                WHERE Id = @id";
+                        cmd.CommandText = @"
+                                            DELETE FROM EmployeeTraining
+                                            WHERE TrainingProgramId = @id;
+                                            DELETE FROM TrainingProgram
+                                            WHERE Id = @id AND StartDate > GetDate();
+                                            ";
                         cmd.Parameters.AddWithValue("@id", id);
 
                         cmd.ExecuteNonQuery();
@@ -126,43 +155,63 @@ namespace Bangazon_Workforce_Management.Controllers
             }
         }
 
-        // GET: TrainingProgram/Delete/5
-        public ActionResult Delete(int id)
+        private TrainingProgram GetSingleTrainingProgram(int id)
         {
-            return View();
-        }
-
-        // POST: TrainingProgram/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, TrainingProgram trainingProgram)
-        {
-            try
+            using (SqlConnection conn = Connection)
             {
-                using (SqlConnection conn = Connection)
+                TrainingProgram program = null;
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())
+                    cmd.CommandText = @"
+                        SELECT Id, [Name], StartDate, EndDate, MaxAttendees
+                        FROM TrainingProgram
+                        WHERE Id = @id
+                    ";
+
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    if (reader.Read())
                     {
-                        // this sql command should remove all tables that the program relates to inside EmployeeTraining
-                        // then it will delete the actual program
-                        cmd.CommandText = @"
-                                            DELETE FROM TrainingProgram
-                                            WHERE StartDate > GetDate() AND Id = @id;
-                                            DELETE FROM EmployeeTraining
-                                            WHERE TrainingProgramId = @id;
-                                            ";
-
-                        cmd.Parameters.AddWithValue("@id", id);
-
-                        cmd.ExecuteNonQuery();
-                        return RedirectToAction(nameof(Index));
+                        program = new TrainingProgram()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
+                        };
                     }
                 }
+                return program;
             }
-            catch
+        }
+        private List<Employee> GetAllProgramEmployees()
+        {
+            using (SqlConnection conn = Connection)
             {
-                throw new Exception("An Error Occurred");
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT Id, FirstName, LastName FROM Employee";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Employee> employees = new List<Employee>();
+                    while (reader.Read())
+                    {
+                        employees.Add(new Employee
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                        });
+                    }
+
+                    reader.Close();
+
+                    return employees;
+                }
             }
         }
     }

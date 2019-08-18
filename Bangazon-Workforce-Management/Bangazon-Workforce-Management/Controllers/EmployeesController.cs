@@ -197,7 +197,7 @@ namespace Bangazon_Workforce_Management.Controllers
             }
         }
 
-        // GET: Instructors/Delete/5
+        // GET: Employee/Delete/5
         public ActionResult Delete(int id)
         {
             //use GetSingleInstructor to get the Instructor you want to delete
@@ -206,7 +206,7 @@ namespace Bangazon_Workforce_Management.Controllers
             return View(employee);
         }
 
-        // POST: Instructors/Delete/5
+        // POST: Employees/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteEmployee(int id)
