@@ -50,8 +50,8 @@ namespace Bangazon_Workforce_Management.Controllers
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
-                            Budget = reader.GetInt32(reader.GetOrdinal("Budget")),
-                            Employees = reader.GetInt32(reader.GetOrdinal("Employees"))
+                            Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
+                            //Employees = reader.GetInt32(reader.GetOrdinal("Employees"))
                         });
 
                         
@@ -86,8 +86,8 @@ namespace Bangazon_Workforce_Management.Controllers
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
-                            Budget = reader.GetInt32(reader.GetOrdinal("Budget")),
-                            Employees = reader.GetInt32(reader.GetOrdinal("Employees"))
+                            Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
+                            //Employees = reader.GetInt32(reader.GetOrdinal("Employees"))
                         };
                     }
                 }

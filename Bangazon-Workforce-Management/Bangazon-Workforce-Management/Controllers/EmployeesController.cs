@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Bangazon_Workforce_Management.Models.ViewModels;
 using Bangazon_Workforce_Management.Models;
-using Bangazon_Workforce_Management.Models.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -38,9 +37,10 @@ namespace Bangazon_Workforce_Management.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT Id, FirstName, LastName, DepartmentId, IsSupervisor
-                        FROM Employee
-                    ";
+                        SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor, d.Name AS DepartmentName, d.Id As DeptId, d.Budget
+                        FROM Employee e
+                        LEFT JOIN Department d ON d.Id = e.DepartmentId
+                        ";
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -52,7 +52,13 @@ namespace Bangazon_Workforce_Management.Controllers
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor"))
+                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
+                            Department = new Department()
+                            {
+                                Name = reader.GetString(reader.GetOrdinal("DepartmentName")),
+                                Id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
+                            }
                         });
                     }
                     reader.Close();
@@ -64,42 +70,56 @@ namespace Bangazon_Workforce_Management.Controllers
 
 
         // GET: Employees/Details/5
-        public ActionResult Details(int id)
-        {
-            Employee employee = null;
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"
-                        SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor, d.[Name]
-                        FROM Employee e
-                        JOIN Department d
-                        ON e.DepartmentId = d.Id
-                        WHERE Id = @id
-                    ";
+        //public ActionResult Details(int id)
+        //{
+        //    Employee employee = null;
+        //    using (SqlConnection conn = Connection)
+        //    {
+        //        conn.Open();
+        //        using (SqlCommand cmd = conn.CreateCommand())
+        //        {
+        //            cmd.CommandText = @"
+        //            SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor, ce.ComputerId, c.Make, c.Manufacturer, c.Id, d.Name AS DepartmentName, et.TrainingProgramId, et.EmployeeId, t.Name
+        //            FROM Employee e
+        //            LEFT JOIN ComputerEmployee ce ON ce.EmployeeId = e.Id
+        //            LEFT JOIN Computer c ON c.Id = ce.ComputerId
+        //            LEFT JOIN Department d ON d.Id = e.DepartmentId
+        //            LEFT JOIN EmployeeTraining et ON et.EmployeeId = e.Id
+        //            LEFT JOIN TrainingProgram t ON t.Id = et.TrainingProgramId
+        //            ";
 
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
-                    SqlDataReader reader = cmd.ExecuteReader();
+        //            cmd.Parameters.Add(new SqlParameter("@id", id));
+        //            SqlDataReader reader = cmd.ExecuteReader();
 
-                    if (reader.Read())
-                    {
-                        employee = new Employee()
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
-                            Name = reader.GetString(reader.GetOrdinal("Name"))
-                        };
-                    }
-                }
-            }
+        //            if (reader.Read())
+        //            {
+        //                List<TrainingProgram> programs = new List<TrainingProgram>();
 
-            return View(employee);
-        }
+        //                employee = new Employee()
+        //                {
+        //                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
+        //                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+        //                    LastName = reader.GetString(reader.GetOrdinal("LastName")),
+        //                    DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+        //                    IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
+        //                    Computer = new Computer()
+        //                    {
+        //                        Make = reader.GetString(reader.GetOrdinal("Make")),
+        //                        Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+        //                        Id = reader.GetInt32(reader.GetOrdinal("ComputerId"))
+        //                    },
+        //                    Department = new Department()
+        //                    {
+        //                        Name = reader.GetString(reader.GetOrdinal("Name")),
+        //                        Id = reader.GetInt32(reader.GetOrdinal("DepartmentId"))
+        //                    }
+        //                };
+        //            }
+        //        }
+        //    }
+
+        //    return View(employee);
+        //}
 
         // GET: Employees/Create
         [HttpGet]
@@ -162,7 +182,7 @@ namespace Bangazon_Workforce_Management.Controllers
             return View(viewModel);
         }
 
-        // POST: Instructors/Edit/5
+        // POST: Employees/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, EmployeeEditViewModel model)
@@ -201,16 +221,16 @@ namespace Bangazon_Workforce_Management.Controllers
             }
         }
 
-        // GET: Instructors/Delete/5
+        // GET: Employees/Delete/5
         public ActionResult Delete(int id)
         {
-            //use GetSingleInstructor to get the Instructor you want to delete
+            //use GetSingleEmployee to get the Employee you want to delete
             Employee employee = GetSingleEmployee(id);
-            //pass that instructor into View()
+            //pass that employee into View()
             return View(employee);
         }
 
-        // POST: Instructors/Delete/5
+        // POST: Employees/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteEmployee(int id)
