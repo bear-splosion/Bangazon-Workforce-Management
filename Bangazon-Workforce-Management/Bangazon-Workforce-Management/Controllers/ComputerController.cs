@@ -43,14 +43,19 @@ namespace Bangazon_Workforce_Management.Controllers
                     SqlDataReader reader = cmd.ExecuteReader();
                     while(reader.Read())
                     {
-                        computers.Add(new Computer()
+                        Computer computer = new Computer
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
                             Make = reader.GetString(reader.GetOrdinal("Make")),
-                            Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
-                            DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate")),
-                            PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate"))
-                        });
+                            Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer"))
+                        };
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("DecomissionDate")))
+                        {
+                            computer.DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate"));
+                        }
+                        computers.Add(computer);
                     }
                     reader.Close();
                 }
@@ -62,28 +67,37 @@ namespace Bangazon_Workforce_Management.Controllers
         public ActionResult Details(int id)
         {
             Computer computer = null;
-            using(SqlConnection conn = Connection)
             {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
+                using (SqlConnection conn = Connection)
                 {
-                    cmd.CommandText = @" SELECT Id, PurchaseDate,DecomissionDate
-                    ,Make
-                    ,Manufacturer 
-                        FROM Computer
-                        WHERE Id = @id";
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    if(reader.Read())
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        computer = new Computer()
+                        cmd.CommandText = @"
+                        SELECT Id, PurchaseDate, DecomissionDate, Make, Manufacturer 
+                        FROM Computer
+                        WHERE Id = @id
+                    ";
+                        cmd.Parameters.AddWithValue("@id", id);
+
+                        SqlDataReader reader = cmd.ExecuteReader();
+
+                        while (reader.Read())
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Make = reader.GetString(reader.GetOrdinal("Make")),
-                            Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
-                            DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate")),
-                            PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate"))
-                        };
+                            computer = new Computer
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
+                                Make = reader.GetString(reader.GetOrdinal("Make")),
+                                Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer"))
+                            };
+
+                            if (!reader.IsDBNull(reader.GetOrdinal("DecomissionDate")))
+                            {
+                                computer.DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate"));
+                            }
+                        }
+                        reader.Close();
                     }
                 }
             }
@@ -179,13 +193,12 @@ namespace Bangazon_Workforce_Management.Controllers
             }
         }
         // GET: Computers By Search
-        public ActionResult SearchComputers(IFormCollection search)
+        public ActionResult Search(IFormCollection input)
         {
-            if (string.IsNullOrEmpty(search["SearchString"][0]))
+            if (input != null)
             {
                 return RedirectToAction(nameof(Index));
             }
-
             List<Computer> computers = new List<Computer>();
             using (SqlConnection conn = Connection)
             {
@@ -194,10 +207,11 @@ namespace Bangazon_Workforce_Management.Controllers
                 {
                     cmd.CommandText = @"SELECT Id, PurchaseDate, DecomissionDate, Make, Manufacturer 
                                         FROM Computer
-                                        WHERE Make LIKE '%' + @search + '%'
-                                        OR Manufacturer LIKE '%' + @search + '%'";
+                                        WHERE Id LIKE '%' + @input + '%'
+                                        OR Make LIKE '%' + @input + '%'
+                                        OR Manufacturer LIKE '%' + @input + '%'";
+                    cmd.Parameters.AddWithValue("@input", input);
 
-                    cmd.Parameters.AddWithValue("@search", search["SearchString"][0]);
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     while (reader.Read())
@@ -221,43 +235,6 @@ namespace Bangazon_Workforce_Management.Controllers
                 }
             }
             return View(computers);
-        }
-        public Computer GetComputerById(int id)
-        {
-            Computer computer = null;
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"
-                        SELECT Id, DecomissionDate, PurchaseDate, Manufacturer, Make 
-                        FROM Computer
-                        WHERE Id = @id
-                    ";
-                    cmd.Parameters.AddWithValue("@id", id);
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    while (reader.Read())
-                    {
-                        computer = new Computer
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
-                            Make = reader.GetString(reader.GetOrdinal("Make")),
-                            Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer"))
-                        };
-
-                        if (!reader.IsDBNull(reader.GetOrdinal("DecomissionDate")))
-                        {
-                            computer.DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate"));
-                        }
-                    }
-                    reader.Close();
-                }
-            }
-            return computer;
         }
     }
 }
