@@ -317,7 +317,7 @@ namespace Bangazon_Workforce_Management.Controllers
                     reader.Close();
                 }
             }
-            return View(computers);
+            return RedirectToAction("Index", computers);
         }
         public Computer GetSearchResults(int id)
         {
@@ -355,8 +355,8 @@ namespace Bangazon_Workforce_Management.Controllers
                         reader.Close();
                     }
                 }
+                return computer;
             }
-            return computer;
         }
     }
 }
