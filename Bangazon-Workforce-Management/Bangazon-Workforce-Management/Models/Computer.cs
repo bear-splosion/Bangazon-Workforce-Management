@@ -12,7 +12,7 @@ namespace Bangazon_Workforce_Management.Models
 
         public string Manufacturer { get; set; }
 
-        [Required]
+            [Required]
         public DateTime PurchaseDate { get; set; }
 
         public DateTime? DecomissionDate { get; set; }
