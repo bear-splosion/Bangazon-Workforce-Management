@@ -51,9 +51,9 @@
             @Html.DisplayFor(model => model.Computer.Make)
         </dd>
     </dl>
-    @*<h4>Training Programs</h4>
-    <hr />*@
-    @*<table class="table">
+    <h4>Training Programs</h4>
+    <hr />
+    <table class="table">
         <thead>
             <tr>
                 <th>
@@ -70,8 +70,8 @@
                 </th>
                 <th></th>
             </tr>
-        </thead>*@
-        @*<tbody>
+        </thead>
+        <tbody>
             @foreach (var item in Model.TrainingPrograms)
             {
                 <tr>
@@ -89,8 +89,8 @@
                     </td>
                 </tr>
             }
-        </tbody>*@
-    @*</table>*@
+        </tbody>
+    </table>
 </div>
 <div>
     @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
