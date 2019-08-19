@@ -86,12 +86,13 @@ namespace Bangazon_Workforce_Management.Controllers
                     LEFT JOIN Department d ON d.Id = e.DepartmentId
                     LEFT JOIN EmployeeTraining et ON et.EmployeeId = e.Id
                     LEFT JOIN TrainingProgram t ON t.Id = et.TrainingProgramId
+                    WHERE e.Id = @id;
                     ";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    if (reader.Read())
+                    while (reader.Read())
                     {
                         List<TrainingProgram> programs = new List<TrainingProgram>();
 
@@ -102,18 +103,21 @@ namespace Bangazon_Workforce_Management.Controllers
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
                             IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
-                            Computer = new Computer()
+                            Department = new Department()
+                            {
+                                Name = reader.GetString(reader.GetOrdinal("DepartmentName")),
+                                Id = reader.GetInt32(reader.GetOrdinal("DepartmentId"))
+                            }
+                        };
+                        if(!reader.IsDBNull(reader.GetOrdinal("ComputerId")))
+                        {
+                            employee.Computer = new Computer()
                             {
                                 Make = reader.GetString(reader.GetOrdinal("Make")),
                                 Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
                                 Id = reader.GetInt32(reader.GetOrdinal("ComputerId"))
-                            },
-                            Department = new Department()
-                            {
-                                Name = reader.GetString(reader.GetOrdinal("Name")),
-                                Id = reader.GetInt32(reader.GetOrdinal("DepartmentId"))
-                            }
-                    };
+                            };
+                        }
 
                     }
                 }
