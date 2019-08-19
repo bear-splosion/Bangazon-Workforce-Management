@@ -181,7 +181,7 @@ namespace Bangazon_Workforce_Management.Controllers
             return View(program);
         }
 
-        // POST: Instructors/Delete/5
+        // POST: TrainingPrograms/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteTrainingProgram(int id)

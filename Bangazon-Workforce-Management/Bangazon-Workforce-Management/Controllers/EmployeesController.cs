@@ -147,7 +147,7 @@ namespace Bangazon_Workforce_Management.Controllers
             return View(viewModel);
         }
 
-        // POST: Students/Create
+        // POST: Employees/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(Employee employee)
