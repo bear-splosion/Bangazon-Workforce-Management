@@ -154,27 +154,64 @@ namespace Bangazon_Workforce_Management.Controllers
         public ActionResult Edit(int id)
         {
             TrainingProgram trainingProgram = GetSingleTrainingProgram(id);
-            List<TrainingProgram> trainingPrograms = GetAllTrainingPrograms();
-            var viewModel = new TrainingProgramEditViewModel(trainingPrograms);
+            List<Employee> employeeList = GetAllProgramEmployees();
+            var viewModel = new TrainingProgramEditViewModel(trainingProgram, employeeList);
             return View(viewModel);
         }
 
         // POST: TrainingPrograms/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, EmployeeEditViewModel model)
         {
             try
             {
                 // TODO: Add update logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"UPDATE Employee
+                                            SET
+                                                FirstName = @firstName,
+                                                LastName = @lastName,
+                                                DepartmentId = @departmentId,
+                                                IsSupervisor = @isSupervisor
+                                            WHERE Id = @id";
+                        cmd.Parameters.AddWithValue("@firstName", model.Employee.FirstName);
+                        cmd.Parameters.AddWithValue("@lastName", model.Employee.LastName);
+                        cmd.Parameters.AddWithValue("@departmentId", model.Employee.DepartmentId);
+                        cmd.Parameters.AddWithValue("@isSupervisor", model.Employee.IsSupervisor);
+                        cmd.Parameters.AddWithValue("@id", id);
 
-                return RedirectToAction(nameof(Index));
+                        cmd.ExecuteNonQuery();
+
+                        return RedirectToAction(nameof(Index));
+
+                    }
+                }
             }
             catch
             {
                 return View();
             }
         }
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public ActionResult Edit(int id, IFormCollection collection)
+        //{
+        //    try
+        //    {
+        //        // TODO: Add update logic here
+
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    catch
+        //    {
+        //        return View();
+        //    }
+        //}
 
         public ActionResult Delete(int id)
         {
