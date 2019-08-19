@@ -89,8 +89,8 @@ namespace Bangazon_Workforce_Management.Controllers
                     LEFT JOIN TrainingProgram t ON t.Id = et.TrainingProgramId
                     ";
 
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
-                    SqlDataReader reader = cmd.ExecuteReader();
+        //            cmd.Parameters.Add(new SqlParameter("@id", id));
+        //            SqlDataReader reader = cmd.ExecuteReader();
 
                     if (reader.Read())
                     {
@@ -118,9 +118,6 @@ namespace Bangazon_Workforce_Management.Controllers
                     }
                 }
             }
-
-            return View(employee);
-        }
 
         // GET: Employees/Create
         [HttpGet]
@@ -177,19 +174,44 @@ namespace Bangazon_Workforce_Management.Controllers
         // GET: Employees/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            Employee employee = GetSingleEmployee(id);
+            List<Department> departments = GetAllDepartments();
+            var viewModel = new EmployeeEditViewModel(employee, departments);
+            return View(viewModel);
         }
 
         // POST: Employees/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, EmployeeEditViewModel model)
         {
             try
             {
                 // TODO: Add update logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"UPDATE Employee
+                                            SET
+                                                FirstName = @firstName,
+                                                LastName = @lastName,
+                                                DepartmentId = @departmentId,
+                                                IsSupervisor = @isSupervisor
+                                            WHERE Id = @id";
+                        cmd.Parameters.AddWithValue("@firstName", model.Employee.FirstName);
+                        cmd.Parameters.AddWithValue("@lastName", model.Employee.LastName);
+                        cmd.Parameters.AddWithValue("@departmentId", model.Employee.DepartmentId);
+                        cmd.Parameters.AddWithValue("@isSupervisor", model.Employee.IsSupervisor);
+                        cmd.Parameters.AddWithValue("@id", id);
 
-                return RedirectToAction(nameof(Index));
+                        cmd.ExecuteNonQuery();
+
+                        return RedirectToAction(nameof(Index));
+
+                    }
+                }
             }
             catch
             {
@@ -197,12 +219,12 @@ namespace Bangazon_Workforce_Management.Controllers
             }
         }
 
-        // GET: Employee/Delete/5
+        // GET: Employees/Delete/5
         public ActionResult Delete(int id)
         {
-            //use GetSingleInstructor to get the Instructor you want to delete
+            //use GetSingleEmployee to get the Employee you want to delete
             Employee employee = GetSingleEmployee(id);
-            //pass that instructor into View()
+            //pass that employee into View()
             return View(employee);
         }
 
@@ -264,6 +286,33 @@ namespace Bangazon_Workforce_Management.Controllers
                     }
                 }
                 return employee;
+            }
+        }
+
+        private List<Department> GetAllDepartments()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT Id, Name FROM Department";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Department> departments = new List<Department>();
+                    while (reader.Read())
+                    {
+                        departments.Add(new Department
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                        });
+                    }
+
+                    reader.Close();
+
+                    return departments;
+                }
             }
         }
     }
