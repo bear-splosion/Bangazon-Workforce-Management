@@ -87,16 +87,25 @@ namespace Bangazon_Workforce_Management.Controllers
                     LEFT JOIN Department d ON d.Id = e.DepartmentId
                     LEFT JOIN EmployeeTraining et ON et.EmployeeId = e.Id
                     LEFT JOIN TrainingProgram t ON t.Id = et.TrainingProgramId
+<<<<<<< HEAD
                     WHERE e.Id = @id
+=======
+>>>>>>> master
                     ";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
+<<<<<<< HEAD
                     List<TrainingProgram> programs = new List<TrainingProgram>();
 
                     while (reader.Read())
                     {
+=======
+                    if (reader.Read())
+                    {
+                        List<TrainingProgram> programs = new List<TrainingProgram>();
+>>>>>>> master
 
                         employee = new Employee()
                         {

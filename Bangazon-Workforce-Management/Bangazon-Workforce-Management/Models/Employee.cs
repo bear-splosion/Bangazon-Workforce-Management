@@ -15,7 +15,7 @@ namespace Bangazon_Workforce_Management.Models
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
-        [Required]
+        //[Required]
         [Display(Name = "Department Id")]
         public int DepartmentId { get; set; }
 
