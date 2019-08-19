@@ -7,8 +7,6 @@ namespace Bangazon_Workforce_Management.Models
     public class TrainingProgram
     {
         public int Id { get; set; }
-
-
         [Required]
         [Display(Name = "Name")]
         public string Name { get; set; }
