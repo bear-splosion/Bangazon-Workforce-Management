@@ -12,11 +12,13 @@ namespace Bangazon_Workforce_Management.Models.ViewModels
 
         public TrainingProgramEditViewModel() { }
 
-        public TrainingProgramEditViewModel(TrainingProgram tra) { }
+        public List<SelectListItem> TrainingPrograms { get; set; }
+
+        public TrainingProgramEditViewModel(TrainingProgram trainingProgram) { }
 
         public TrainingProgramEditViewModel(TrainingProgram trainingProgram, List<Employee> employeeList)
         {
-            TrainingProgram = trainingProgram;
+            trainingProgram = trainingProgram;
             Employees = employeeList
                 .Select(employee => new SelectListItem
                 {
@@ -31,7 +33,6 @@ namespace Bangazon_Workforce_Management.Models.ViewModels
             });
         }
 
-        public List<SelectListItem> TrainingPrograms { get; set; }
 
 
         //public TrainingProgramEditViewModel((TrainingProgram trainingProgram, List<TrainingProgram> trainingProgramList)

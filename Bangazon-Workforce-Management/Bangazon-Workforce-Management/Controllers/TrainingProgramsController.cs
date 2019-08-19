@@ -162,7 +162,7 @@ namespace Bangazon_Workforce_Management.Controllers
         // POST: TrainingPrograms/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, EmployeeEditViewModel model)
+        public ActionResult Edit(int id, TrainingProgramEditViewModel model)
         {
             try
             {
@@ -172,17 +172,17 @@ namespace Bangazon_Workforce_Management.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"UPDATE Employee
+                        cmd.CommandText = @"UPDATE TrainingProgram
                                             SET
-                                                FirstName = @firstName,
-                                                LastName = @lastName,
-                                                DepartmentId = @departmentId,
-                                                IsSupervisor = @isSupervisor
+                                                Name = @Name,
+                                                StartDate = @startDate,
+                                                EndDate = @endDate,
+                                                MaxAttendees = @maxAttendees
                                             WHERE Id = @id";
-                        cmd.Parameters.AddWithValue("@firstName", model.Employee.FirstName);
-                        cmd.Parameters.AddWithValue("@lastName", model.Employee.LastName);
-                        cmd.Parameters.AddWithValue("@departmentId", model.Employee.DepartmentId);
-                        cmd.Parameters.AddWithValue("@isSupervisor", model.Employee.IsSupervisor);
+                        cmd.Parameters.AddWithValue("@Name", model.trainingProgram.Name);
+                        cmd.Parameters.AddWithValue("@startDate", model.trainingProgram.StartDate);
+                        cmd.Parameters.AddWithValue("@endDate", model.trainingProgram.EndDate);
+                        cmd.Parameters.AddWithValue("@maxAttendees", model.trainingProgram.MaxAttendees);
                         cmd.Parameters.AddWithValue("@id", id);
 
                         cmd.ExecuteNonQuery();
@@ -197,21 +197,6 @@ namespace Bangazon_Workforce_Management.Controllers
                 return View();
             }
         }
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public ActionResult Edit(int id, IFormCollection collection)
-        //{
-        //    try
-        //    {
-        //        // TODO: Add update logic here
-
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
 
         public ActionResult Delete(int id)
         {
