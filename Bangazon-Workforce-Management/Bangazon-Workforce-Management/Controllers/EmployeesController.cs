@@ -117,15 +117,16 @@ namespace Bangazon_Workforce_Management.Controllers
                                 Id = reader.GetInt32(reader.GetOrdinal("DepartmentId"))
                             }
                         };
-
-                        TrainingProgram program = new TrainingProgram()
+                        if (!reader.IsDBNull(reader.GetOrdinal("TrainingProgramId")))
                         {
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            Id = reader.GetInt32(reader.GetOrdinal("TrainingProgramId"))
-                        };
-                        programs.Add(program);
+                            TrainingProgram program = new TrainingProgram()
+                            {
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                Id = reader.GetInt32(reader.GetOrdinal("TrainingProgramId"))
+                            };
+                            programs.Add(program);
+                        }
                     }
-
                     employee.TrainingPrograms = programs;
 
                     reader.Close();
