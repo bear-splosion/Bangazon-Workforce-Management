@@ -70,56 +70,57 @@ namespace Bangazon_Workforce_Management.Controllers
 
 
         // GET: Employees/Details/5
-        //public ActionResult Details(int id)
-        //{
-        //    Employee employee = null;
-        //    using (SqlConnection conn = Connection)
-        //    {
-        //        conn.Open();
-        //        using (SqlCommand cmd = conn.CreateCommand())
-        //        {
-        //            cmd.CommandText = @"
-        //            SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor, ce.ComputerId, c.Make, c.Manufacturer, c.Id, d.Name AS DepartmentName, et.TrainingProgramId, et.EmployeeId, t.Name
-        //            FROM Employee e
-        //            LEFT JOIN ComputerEmployee ce ON ce.EmployeeId = e.Id
-        //            LEFT JOIN Computer c ON c.Id = ce.ComputerId
-        //            LEFT JOIN Department d ON d.Id = e.DepartmentId
-        //            LEFT JOIN EmployeeTraining et ON et.EmployeeId = e.Id
-        //            LEFT JOIN TrainingProgram t ON t.Id = et.TrainingProgramId
-        //            ";
+        public ActionResult Details(int id)
+        {
+            Employee employee = null;
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                    SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor, ce.ComputerId, c.Make, c.Manufacturer, c.Id, d.Name AS DepartmentName, et.TrainingProgramId, et.EmployeeId, t.Name
+                    FROM Employee e
+                    LEFT JOIN ComputerEmployee ce ON ce.EmployeeId = e.Id
+                    LEFT JOIN Computer c ON c.Id = ce.ComputerId
+                    LEFT JOIN Department d ON d.Id = e.DepartmentId
+                    LEFT JOIN EmployeeTraining et ON et.EmployeeId = e.Id
+                    LEFT JOIN TrainingProgram t ON t.Id = et.TrainingProgramId
+                    ";
 
-        //            cmd.Parameters.Add(new SqlParameter("@id", id));
-        //            SqlDataReader reader = cmd.ExecuteReader();
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
 
-        //            if (reader.Read())
-        //            {
-        //                List<TrainingProgram> programs = new List<TrainingProgram>();
+                    if (reader.Read())
+                    {
+                        List<TrainingProgram> programs = new List<TrainingProgram>();
 
-        //                employee = new Employee()
-        //                {
-        //                    Id = reader.GetInt32(reader.GetOrdinal("Id")),
-        //                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-        //                    LastName = reader.GetString(reader.GetOrdinal("LastName")),
-        //                    DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-        //                    IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
-        //                    Computer = new Computer()
-        //                    {
-        //                        Make = reader.GetString(reader.GetOrdinal("Make")),
-        //                        Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
-        //                        Id = reader.GetInt32(reader.GetOrdinal("ComputerId"))
-        //                    },
-        //                    Department = new Department()
-        //                    {
-        //                        Name = reader.GetString(reader.GetOrdinal("Name")),
-        //                        Id = reader.GetInt32(reader.GetOrdinal("DepartmentId"))
-        //                    }
-        //                };
-        //            }
-        //        }
-        //    }
+                        employee = new Employee()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
+                            Computer = new Computer()
+                            {
+                                Make = reader.GetString(reader.GetOrdinal("Make")),
+                                Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer")),
+                                Id = reader.GetInt32(reader.GetOrdinal("ComputerId"))
+                            },
+                            Department = new Department()
+                            {
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                Id = reader.GetInt32(reader.GetOrdinal("DepartmentId"))
+                            }
+                    };
 
-        //    return View(employee);
-        //}
+                    }
+                }
+            }
+
+            return View(employee);
+        }
 
         // GET: Employees/Create
         [HttpGet]
