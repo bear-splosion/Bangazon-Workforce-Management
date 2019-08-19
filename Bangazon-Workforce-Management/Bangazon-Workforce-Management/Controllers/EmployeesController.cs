@@ -89,8 +89,8 @@ namespace Bangazon_Workforce_Management.Controllers
                     LEFT JOIN TrainingProgram t ON t.Id = et.TrainingProgramId
                     ";
 
-        //            cmd.Parameters.Add(new SqlParameter("@id", id));
-        //            SqlDataReader reader = cmd.ExecuteReader();
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
 
                     if (reader.Read())
                     {
@@ -114,10 +114,13 @@ namespace Bangazon_Workforce_Management.Controllers
                                 Name = reader.GetString(reader.GetOrdinal("DepartmentName")),
                                 Id = reader.GetInt32(reader.GetOrdinal("DepartmentId"))
                             }
-                    };
+                        };
                     }
+                    reader.Close();
                 }
             }
+           return View(employee);
+        }
 
         // GET: Employees/Create
         [HttpGet]
