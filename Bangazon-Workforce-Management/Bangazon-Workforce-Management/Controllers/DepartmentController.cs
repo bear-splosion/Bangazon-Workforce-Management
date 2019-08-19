@@ -37,36 +37,43 @@ namespace Bangazon_Workforce_Management.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT d.Id, d.[Name], d.Budget, e.Id, e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor FROM Department d LEFT JOIN Employee e ON d.Id = e.DepartmentId";
+                    cmd.CommandText = @"SELECT d.Id, d.[Name], d.Budget, e.Id AS EmployeeId, e.FirstName, e.LastName, e.DepartmentId FROM Department d LEFT JOIN Employee e ON d.Id = e.DepartmentId";
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     while(reader.Read())
                     {
                         Department department = new Department
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
-                        };
-
-                        Employee employee = new Employee
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                                DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                                IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor"))
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
                             };
 
-                        if (departments.Any(d => d.Id == department.Id))
+                        Employee employee = null;
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("FirstName")) & !reader.IsDBNull(reader.GetOrdinal("LastName")))
+                        {
+                             employee = new Employee
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId"))
+                            };
+                        }
+                        if (employee != null && departments.Any(d => d.Id == department.Id))
                         {
                             Department ExistingDepo = departments.Find(d => d.Id == department.Id);
                             ExistingDepo.Employees.Add(employee);
                         }
-                        else
+                        else if (employee != null && !departments.Any(d => d.Id == department.Id))
                         {
                             department.Employees.Add(employee);
+                            departments.Add(department);
+                        }
+                        else if (!departments.Any(d => d.Id == department.Id))
+                        {
                             departments.Add(department);
                         }
                     }
@@ -87,7 +94,7 @@ namespace Bangazon_Workforce_Management.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT d.Id, d.[Name], d.Budget, e.Id, e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor FROM Department d LEFT JOIN Employee e ON d.Id = e.DepartmentId WHERE d.Id = @id
+                        SELECT d.Id, d.[Name], d.Budget, e.Id AS EmployeeId, e.FirstName, e.LastName FROM Department d LEFT JOIN Employee e ON d.Id = e.DepartmentId WHERE d.Id = @id
                         ";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
@@ -103,19 +110,20 @@ namespace Bangazon_Workforce_Management.Controllers
                                 Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
                             };
                         }
+                        if (!reader.IsDBNull(reader.GetOrdinal("FirstName")) & !reader.IsDBNull(reader.GetOrdinal("LastName")))
+                        {
                         department.Employees.Add(
                             new Employee
                             {
-                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
                                 FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                                DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
-                                IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor"))
+                                LastName = reader.GetString(reader.GetOrdinal("LastName"))
                             }
                         );
                     }
                 }
             }
+        }
             return View(department);
         }
         // GET: Department/Create
