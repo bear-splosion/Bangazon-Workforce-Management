@@ -1,5 +1,4 @@
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -12,11 +11,11 @@ using Microsoft.Extensions.Configuration;
 
 namespace Bangazon_Workforce_Management.Controllers
 {
-    public class DepartmentController : Controller
+    public class TrainingProgramsController : Controller
     {
         private readonly IConfiguration _config;
 
-        public DepartmentController(IConfiguration config)
+        public TrainingProgramsController(IConfiguration config)
         {
             _config = config;
         }
@@ -28,107 +27,117 @@ namespace Bangazon_Workforce_Management.Controllers
                 return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
             }
         }
-
-        // GET: Department
+        // GET: TRAINING PROGRAMS
         public ActionResult Index()
         {
-            var departments = new List<Department>();
-            using (SqlConnection conn = Connection)
-            {
-                conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand())
-                {
-                    cmd.CommandText = @"SELECT d.Id, d.[Name], d.Budget, COUNT(e.Id) AS Employees 
-                                            FROM Department d LEFT JOIN Employee e ON d.Id = e.DepartmentId 
-                                                GROUP BY d.Id, d.[Name], d.Budget, e.DepartmentId";
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    while(reader.Read())
-                    {
-                        departments.Add(new Department()
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
-                            //Employees = reader.GetInt32(reader.GetOrdinal("Employees"))
-                        });
-
-                        
-                    }
-                    reader.Close();
-                }
-            }
-            return View(departments);
-        }
-
-        // GET: Department/Details/5
-        
-        public ActionResult Details(int id)
-        {
-            Department department = null;
+            var trainingPrograms = new List<TrainingProgram>();
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT d.Id, d.[Name], d.Budget, COUNT(e.Id) AS Employees 
-                            FROM Department d LEFT JOIN Employee e ON d.Id = e.DepartmentId 
-                            WHERE d.Id = @id
-                            GROUP BY d.Id, d.[Name], d.Budget, e.DepartmentId
-                        ";
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                        SELECT Id, Name, StartDate, EndDate, MaxAttendees
+                        FROM TrainingProgram
+                        WHERE StartDate > GetDate();
+                    ";
+
                     SqlDataReader reader = cmd.ExecuteReader();
-                    if (reader.Read())
+
+                    while (reader.Read())
                     {
-                        department = new Department()
+                        trainingPrograms.Add(new TrainingProgram()
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             Name = reader.GetString(reader.GetOrdinal("Name")),
-                            Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
-                            //Employees = reader.GetInt32(reader.GetOrdinal("Employees"))
+                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
+                        });
+                    }
+                    reader.Close();
+                }
+            }
+
+            return View(trainingPrograms);
+        }
+
+
+        // GET: TrainingPrograms/Details/5
+        public ActionResult Details(int id)
+        {
+            TrainingProgram trainingProgram = null;
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT Id, Name, StartDate, EndDate, MaxAttendees
+                        FROM TrainingProgram
+                        WHERE Id = @id
+                    ";
+
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    if (reader.Read())
+                    {
+                        trainingProgram = new TrainingProgram()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
                         };
                     }
                 }
             }
-            return View(department);
+
+            return View(trainingProgram);
         }
-        // GET: Department/Create
+
+        // GET: TrainingPrograms/Create
         [HttpGet]
         public ActionResult Create()
         {
-            var ViewModel = new DepartmentCreateViewModel(_config.GetConnectionString("DefaultConnection"));
-            return View(ViewModel);
+            var viewModel = new TrainingProgramCreateViewModel(_config.GetConnectionString("DefaultConnection"));
+            return View(viewModel);
         }
 
-        // POST: Department/Create
+        // POST: TrainingPrograms/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Department department)
+        public ActionResult Create(TrainingProgram trainingProgram)
         {
             try
             {
-
-                //now, write it to the DB
                 using (SqlConnection conn = Connection)
                 {
                     conn.Open();
+
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"
-                       INSERT INTO Department (
-                          Name,
-                          Budget
-                      ) VALUES (
-                           @name,
-                           @budget
-                       )
-                      ";
-                        cmd.Parameters.AddWithValue("@name", department.Name);
-                        cmd.Parameters.AddWithValue("@budget", department.Budget);
+                            INSERT INTO TrainingProgram (
+                                Name, 
+                                StartDate, 
+                                EndDate,
+                                MaxAttendees
+                            ) VALUES (
+                                @Name,
+                                @StartDate,
+                                @EndDate,
+                                @MaxAttendees
+                            )
+                        ";
 
-                        //now, Execute command
+                        cmd.Parameters.AddWithValue("@Name", trainingProgram.Name);
+                        cmd.Parameters.AddWithValue("@StartDate", trainingProgram.StartDate);
+                        cmd.Parameters.AddWithValue("@EndDate", trainingProgram.EndDate);
+                        cmd.Parameters.AddWithValue("@MaxAttendees", trainingProgram.MaxAttendees);
+
                         cmd.ExecuteNonQuery();
                     }
                 }
@@ -140,14 +149,13 @@ namespace Bangazon_Workforce_Management.Controllers
                 return View();
             }
         }
-
-        // GET: Department/Edit/5
+        // GET: TrainingPrograms/Edit/5
         public ActionResult Edit(int id)
         {
             return View();
         }
 
-        // POST: Department/Edit/5
+        // POST: TrainingPrograms/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, IFormCollection collection)
@@ -164,13 +172,13 @@ namespace Bangazon_Workforce_Management.Controllers
             }
         }
 
-        // GET: Department/Delete/5
+        // GET: TrainingPrograms/Delete/5
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: Department/Delete/5
+        // POST: TrainingPrograms/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
@@ -187,5 +195,4 @@ namespace Bangazon_Workforce_Management.Controllers
             }
         }
     }
-
 }
