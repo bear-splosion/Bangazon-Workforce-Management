@@ -27,15 +27,17 @@ namespace Bangazon_Workforce_Management.Controllers
                 return new SqlConnection(_config.GetConnectionString("DefaultConnection"));
             }
         }
-        // GET: EMPLOYEES
+        // GET: Employees
         public ActionResult Index()
         {
             var employees = new List<Employee>();
+
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
+
                     cmd.CommandText = @"
                         SELECT e.Id, e.FirstName, e.LastName, e.DepartmentId, e.IsSupervisor, d.Name AS DepartmentName, d.Id As DeptId, d.Budget
                         FROM Employee e
@@ -64,7 +66,6 @@ namespace Bangazon_Workforce_Management.Controllers
                     reader.Close();
                 }
             }
-
             return View(employees);
         }
 
@@ -92,9 +93,10 @@ namespace Bangazon_Workforce_Management.Controllers
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
+                    List<TrainingProgram> programs = new List<TrainingProgram>();
+
                     while (reader.Read())
                     {
-                        List<TrainingProgram> programs = new List<TrainingProgram>();
 
                         employee = new Employee()
                         {
@@ -119,11 +121,22 @@ namespace Bangazon_Workforce_Management.Controllers
                             };
                         }
 
+                        if (!reader.IsDBNull(reader.GetOrdinal("TrainingProgramId")))
+                        {
+                            TrainingProgram program = new TrainingProgram()
+                            {
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                Id = reader.GetInt32(reader.GetOrdinal("TrainingProgramId"))
+                            };
+                            programs.Add(program);
+                        }
                     }
+                    employee.TrainingPrograms = programs;
+
+                    reader.Close();
                 }
             }
-
-            return View(employee);
+           return View(employee);
         }
 
         // GET: Employees/Create
