@@ -153,7 +153,10 @@ namespace Bangazon_Workforce_Management.Controllers
         // GET: TrainingPrograms/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            TrainingProgram trainingProgram = GetSingleTrainingProgram(id);
+            List<TrainingProgram> trainingPrograms = GetAllTrainingPrograms();
+            var viewModel = new TrainingProgramEditViewModel(trainingPrograms);
+            return View(viewModel);
         }
 
         // POST: TrainingPrograms/Edit/5
