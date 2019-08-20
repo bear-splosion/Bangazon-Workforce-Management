@@ -12,9 +12,11 @@ namespace Bangazon_Workforce_Management.Models
 
         public string Manufacturer { get; set; }
 
-            [Required]
+        [Required]
+        [Display(Name = "Purchased")]
         public DateTime PurchaseDate { get; set; }
 
+        [Display(Name = "Decommissioned")]
         public DateTime? DecomissionDate { get; set; }
         public int EmployeeId { get; set; }
         public Employee employee { get; set; }
