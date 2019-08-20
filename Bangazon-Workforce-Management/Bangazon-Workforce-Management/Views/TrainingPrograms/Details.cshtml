@@ -40,17 +40,28 @@
         <dd>
             @Html.DisplayFor(model => model.MaxAttendees)
         </dd>
+
         @foreach (var item in Model.AttendingEmployees)
         {
             if (item.FullName != null)
             {
                 <dt>
-                    @Html.DisplayNameFor(modelItem => item.FullName)
+                    @Html.DisplayNameFor(model => item.FullName)
                 </dt>
                 <dd>
-                    @Html.DisplayFor(modelItem => item.FullName)
+                    @Html.DisplayFor(model => item.FullName)
                 </dd>
             }
+            else
+            {
+                <dt>
+                    @Html.DisplayNameFor(model => item.FullName)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => item.FullName)
+                </dd>
+            }
+
         }
     </dl>
 </div>
