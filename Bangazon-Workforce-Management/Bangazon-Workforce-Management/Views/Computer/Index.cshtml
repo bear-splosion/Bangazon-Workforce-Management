@@ -24,7 +24,12 @@
             <th>
                 @Html.DisplayNameFor(model => model.PurchaseDate)
             </th>
-          
+            <th>
+                @Html.DisplayNameFor(model => model.DecomissionDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EmployeeId)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -47,18 +52,14 @@
                 @Html.DisplayFor(modelItem => item.DecomissionDate)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new {  id=item.Id }) |
-                @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-                @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+                @Html.DisplayFor(modelItem => item.EmployeeId)
+            </td>
+            <td>
+                
+                @Html.ActionLink("Details", "Details", new {  id=item.Id }) |
+                @Html.ActionLink("Delete", "Delete", new {  id=item.Id })
             </td>
         </tr>
 }
     </tbody>
 </table>
-<form asp-controller="Computer" asp-action="SearchComputers">
-    <p>
-        Search: <input type="text" name="SearchString">
-        <input type="submit" value="Search" />
-    </p>
-</form>
-
