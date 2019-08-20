@@ -18,7 +18,7 @@
         </dd>
         @foreach (var item in Model.Employees)
         {
-            if (item.FirstName != null)
+            if (item.FullName != null)
             {
             <dt>
                 @Html.DisplayNameFor(modelItem => item.FullName)

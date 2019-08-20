@@ -28,7 +28,7 @@ namespace Bangazon_Workforce_Management.Controllers
             }
         }
         // GET: TRAINING PROGRAMS
-        public ActionResult Index()
+        public ActionResult Index(bool Past)
         {
             var trainingPrograms = new List<TrainingProgram>();
             using (SqlConnection conn = Connection)
@@ -36,12 +36,22 @@ namespace Bangazon_Workforce_Management.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
+                    if(Past == true)
+                    {
                     cmd.CommandText = @"
                         SELECT Id, Name, StartDate, EndDate, MaxAttendees
                         FROM TrainingProgram
+                        WHERE StartDate < GetDate();
+                        ";
+                    }
+                    else if (Past == false)
+                    {
+                        cmd.CommandText = @"
+                        SELECT Id, Name, StartDate, EndDate, MaxAttendees
+                        FROM TrainingProgram
                         WHERE StartDate > GetDate();
-
-                    ";
+                        ";
+                    }
 
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -74,24 +84,40 @@ namespace Bangazon_Workforce_Management.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT Id, Name, StartDate, EndDate, MaxAttendees
-                        FROM TrainingProgram
-                        WHERE Id = @id
+                        SELECT tp.Id, tp.Name, tp.StartDate, tp.EndDate, tp.MaxAttendees, e.Id AS EmployeeId, e.FIrstName, e.LastName
+                        FROM TrainingProgram tp
+                        LEFT JOIN EmployeeTraining et ON tp.Id = et.TrainingProgramId
+                        LEFT JOIN Employee e ON et.EmployeeId = e.Id
+                        WHERE tp.Id = @id
                     ";
 
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    if (reader.Read())
+                    while (reader.Read())
                     {
-                        trainingProgram = new TrainingProgram()
+                        if(trainingProgram == null)
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
-                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
-                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
-                        };
+                            trainingProgram = new TrainingProgram()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                                EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                                MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
+                            };
+                        }
+                        if(!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
+                        {
+                            trainingProgram.AttendingEmployees.Add(
+                                new Employee
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                                    FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                    LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                                }
+                            );
+                        }
                     }
                 }
             }
@@ -153,19 +179,52 @@ namespace Bangazon_Workforce_Management.Controllers
         // GET: TrainingPrograms/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            var trainingProgram = GetSingleTrainingProgram(id);
+            DateTime currentDate = DateTime.Now;
+
+            if (trainingProgram.StartDate > currentDate)
+            {
+                return View(trainingProgram);
+            }
+            else
+            {
+                throw new Exception("An Error Occurred");
+            }
         }
+
 
         // POST: TrainingPrograms/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+         public ActionResult Edit(int id, TrainingProgram model)
         {
             try
             {
                 // TODO: Add update logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"UPDATE TrainingProgram
+                                            SET
+                                                Name = @name,
+                                                StartDate = @startDate,
+                                                EndDate = @endDate,
+                                                MaxAttendees = @maxAttendees
+                                            WHERE Id = @id";
+                        cmd.Parameters.AddWithValue("@name", model.Name);
+                        cmd.Parameters.AddWithValue("@startDate", model.StartDate);
+                        cmd.Parameters.AddWithValue("@endDate", model.EndDate);
+                        cmd.Parameters.AddWithValue("@maxAttendees", model.MaxAttendees);
+                        cmd.Parameters.AddWithValue("@id", id);
 
-                return RedirectToAction(nameof(Index));
+                        cmd.ExecuteNonQuery();
+
+                        return RedirectToAction(nameof(Index));
+
+                    }
+                }
             }
             catch
             {
@@ -272,5 +331,5 @@ namespace Bangazon_Workforce_Management.Controllers
                 }
             }
         }
+        }
     }
-}

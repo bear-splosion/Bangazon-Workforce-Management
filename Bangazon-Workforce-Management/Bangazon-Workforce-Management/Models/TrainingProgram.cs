@@ -20,6 +20,6 @@ namespace Bangazon_Workforce_Management.Models
         [Display(Name = "Max Attendees")]
         public int MaxAttendees { get; set; }
 
-      //  List<Employee> AttendingEmployees { get; set; } = new List<Employee>();
+        public List<Employee> AttendingEmployees { get; set; } = new List<Employee>();
     }
 }
