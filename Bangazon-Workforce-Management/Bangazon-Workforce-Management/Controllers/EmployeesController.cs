@@ -303,7 +303,9 @@ namespace Bangazon_Workforce_Management.Controllers
                         (EmployeeId, TrainingProgramId)
                         VALUES (@employeeId, @trainingProgramId)";
                         cmd.Parameters.AddWithValue("@employeeId", id);
-                        cmd.Parameters.AddWithValue("@trainingProgramId", id);
+                        cmd.Parameters.AddWithValue("@trainingProgramId", model.TrainingProgramId);
+
+                        cmd.ExecuteNonQuery();
 
                     }
                 }

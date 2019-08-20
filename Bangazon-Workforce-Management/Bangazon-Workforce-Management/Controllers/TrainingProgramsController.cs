@@ -188,7 +188,7 @@ namespace Bangazon_Workforce_Management.Controllers
             }
             else
             {
-                throw new Exception("An Error Occurred");
+                return RedirectToAction(nameof(Index));
             }
         }
 
