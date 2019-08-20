@@ -221,9 +221,10 @@ namespace Bangazon_Workforce_Management.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"DELETE FROM Computer
-                                                WHERE Id = @id";
+                        cmd.CommandText = @"DELETE FROM ComputerEmployee WHERE ComputerId = @id
+                                                 DELETE FROM Computer WHERE Id = @id";
                         cmd.Parameters.AddWithValue("@id", id);
+                     
 
                         cmd.ExecuteNonQuery();
                     }
