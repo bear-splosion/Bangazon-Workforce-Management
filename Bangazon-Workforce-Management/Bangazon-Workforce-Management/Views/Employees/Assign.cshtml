@@ -1,22 +1,31 @@
-﻿@model Bangazon_Workforce_Management.Models.ViewModels.EmployeeTrainingProgramViewModel
+﻿@model IEnumerable<Bangazon_Workforce_Management.Models.TrainingProgram>
 
 @{
-    ViewData["Title"] = "Assign";
+    ViewData["Title"] = "Index";
 }
 
-<h2>Assign</h2>
+<h2>Index</h2>
 
-<h4>EmployeeTrainingProgramViewModel</h4>
-<hr />
-
+<p>
+    <a asp-action="Assign">Assign</a>
+</p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.TrainingProgram.Id)
+                @Html.DisplayNameFor(model => model.Id)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TrainingProgram.Name)
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StartDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EndDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MaxAttendees)
             </th>
             <th></th>
         </tr>
@@ -32,6 +41,15 @@
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td>
+                    @Html.DisplayFor(modelItem => item.StartDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EndDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MaxAttendees)
+                </td>
+                <td>
                     @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
                     @Html.ActionLink("Details", "Details", new { id = item.Id }) |
                     @Html.ActionLink("Delete", "Delete", new { id = item.Id })
@@ -40,21 +58,7 @@
         }
     </tbody>
 </table>
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Assign">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
-            </div>
-        </form>
-    </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+<p>
+    <a asp-action="Index" asp-route-Past="true">View Past Dates</a>
+    <a asp-action="Index">Upcoming Dates</a>
+</p>
