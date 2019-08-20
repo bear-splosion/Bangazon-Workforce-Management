@@ -111,7 +111,7 @@ namespace Bangazon_Workforce_Management.Controllers
                                 Id = reader.GetInt32(reader.GetOrdinal("DepartmentId"))
                             }
                         };
-                        if(!reader.IsDBNull(reader.GetOrdinal("ComputerId")))
+                        if (!reader.IsDBNull(reader.GetOrdinal("ComputerId")))
                         {
                             employee.Computer = new Computer()
                             {
@@ -136,7 +136,7 @@ namespace Bangazon_Workforce_Management.Controllers
                     reader.Close();
                 }
             }
-           return View(employee);
+            return View(employee);
         }
 
         // GET: Employees/Create
@@ -276,6 +276,45 @@ namespace Bangazon_Workforce_Management.Controllers
             }
         }
 
+        // GET: Employees/Assign/5
+
+        public ActionResult Assign(int id)
+        {
+            Employee employee = GetSingleEmployee(id);
+            List<TrainingProgram> trainingPrograms = GetAllTrainingPrograms();
+            var viewModel = new EmployeeTrainingProgramViewModel(employee, trainingPrograms);
+            return View(viewModel);
+        }
+
+        // POST: Employees/Assign/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Assign(int id, EmployeeTrainingProgramViewModel model)
+        {
+            try
+            {
+                // TODO: Add update logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"INSERT INTO EmployeeTraining 
+                        (EmployeeId, TrainingProgramId)
+                        VALUES (@employeeId, @trainingProgramId)";
+                        cmd.Parameters.AddWithValue("@employeeId", id);
+                        cmd.Parameters.AddWithValue("@trainingProgramId", id);
+
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
         private Employee GetSingleEmployee(int id)
         {
             using (SqlConnection conn = Connection)
@@ -332,6 +371,33 @@ namespace Bangazon_Workforce_Management.Controllers
                     reader.Close();
 
                     return departments;
+                }
+            }
+        }
+
+        private List<TrainingProgram> GetAllTrainingPrograms()
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "SELECT Id, Name FROM TrainingProgram";
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
+                    while (reader.Read())
+                    {
+                        trainingPrograms.Add(new TrainingProgram
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                        });
+                    }
+
+                    reader.Close();
+
+                    return trainingPrograms;
                 }
             }
         }

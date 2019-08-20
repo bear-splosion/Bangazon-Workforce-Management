@@ -8,13 +8,33 @@ namespace Bangazon_Workforce_Management.Models.ViewModels
 {
     public class EmployeeTrainingProgramViewModel
     {
-    public List<SelectListItem> TrainingProgramList { get; set; }
+        public EmployeeTrainingProgramViewModel() { }
 
-    public TrainingProgram TrainingProgram { get; set; }
+        public List<SelectListItem> TrainingPrograms { get; set; }
 
-    public Employee Employee { get; set; }
+        public TrainingProgram TrainingProgram { get; set; }
 
-    public Department Department { get; set; }
+        public Employee Employee { get; set; }
+
+        public Department Department { get; set; }
+
+        public EmployeeTrainingProgramViewModel(Employee employee, List<TrainingProgram> trainingProgramList)
+        {
+            Employee = employee;
+            TrainingPrograms = trainingProgramList
+                .Select(trainingProgram => new SelectListItem
+                {
+                    Text = trainingProgram.Name,
+                    Value = trainingProgram.Id.ToString()
+                })
+                .ToList();
+
+            TrainingPrograms.Insert(0, new SelectListItem
+            {
+                Text = "Choose a training program...",
+                Value = "0"
+            });
+        }
     }
 }
 
