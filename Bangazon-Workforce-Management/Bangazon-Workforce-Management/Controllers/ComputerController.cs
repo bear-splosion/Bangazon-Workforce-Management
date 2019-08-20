@@ -38,12 +38,12 @@ namespace Bangazon_Workforce_Management.Controllers
                 conn.Open();
                 using(SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @" SELECT Id, PurchaseDate,DecomissionDate
-                    ,Make
-                    ,Manufacturer 
-                        FROM Computer";
+                    cmd.CommandText = @" SELECT c.Id, c.Make, c.Manufacturer, c.PurchaseDate, c.DecomissionDate, e.Id AS EmployeeId
+                FROM Computer c 
+                LEFT JOIN ComputerEmployee ce ON ce.ComputerId = c.Id
+                LEFT JOIN Employee e ON ce.EmployeeId = e.Id ";
                     SqlDataReader reader = cmd.ExecuteReader();
-                    while(reader.Read())
+                    while (reader.Read())
                     {
                         Computer computer = new Computer
                         {
@@ -51,12 +51,20 @@ namespace Bangazon_Workforce_Management.Controllers
                             PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
                             Make = reader.GetString(reader.GetOrdinal("Make")),
                             Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer"))
+                           
+
                         };
+
 
                         if (!reader.IsDBNull(reader.GetOrdinal("DecomissionDate")))
                         {
                             computer.DecomissionDate = reader.GetDateTime(reader.GetOrdinal("DecomissionDate"));
-                        }
+                        } else if (!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
+                        {
+                            computer.EmployeeId = reader.GetInt32(reader.GetOrdinal("EmployeeId"));
+                        };
+
+                    
                         computers.Add(computer);
                     }
                     reader.Close();
@@ -76,7 +84,7 @@ namespace Bangazon_Workforce_Management.Controllers
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"
-                        SELECT Id, PurchaseDate, DecomissionDate, Make, Manufacturer 
+                        SELECT Id, PurchaseDate, DecomissionDate, Make, Manufacturer
                         FROM Computer
                         WHERE Id = @id
                     ";
@@ -92,6 +100,8 @@ namespace Bangazon_Workforce_Management.Controllers
                                 PurchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
                                 Make = reader.GetString(reader.GetOrdinal("Make")),
                                 Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer"))
+                               
+
                             };
 
                             if (!reader.IsDBNull(reader.GetOrdinal("DecomissionDate")))
@@ -132,24 +142,37 @@ namespace Bangazon_Workforce_Management.Controllers
                             Make,
                             Manufacturer,
                              PurchaseDate)
+                            OUTPUT INSERTED.Id
+                            
                         VALUES (
                              @make, 
                              @manufacturer,
-                             @purchaseDate)
+                             @purchaseDate 
+                            )
                          ";
                         
                         cmd.Parameters.AddWithValue("@make", computer.Make);
                         cmd.Parameters.AddWithValue("@manufacturer", computer.Manufacturer);
                         cmd.Parameters.AddWithValue("@purchaseDate", computer.PurchaseDate);
-
+                      
+                        int newId = (int)cmd.ExecuteScalar();
+                        computer.Id = newId;
+                       
+                        cmd.CommandText = @" INSERT INTO ComputerEmployee
+                                            ( ComputerId, EmployeeId, AssignDate )
+                                                VALUES( @newId, @employeeId, CURRENT_TIMESTAMP)";
+                        cmd.Parameters.AddWithValue("@newId", computer.Id);
+                        cmd.Parameters.AddWithValue("@employeeId", computer.EmployeeId);
+                       
                         cmd.ExecuteNonQuery();
+
                     }
                 }
                 // TODO: Add insert logic here
 
                 return RedirectToAction(nameof(Index));
             }
-            catch
+            catch(Exception ex)
             {
                 return View();
             }
