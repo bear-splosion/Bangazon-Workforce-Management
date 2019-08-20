@@ -382,7 +382,8 @@ namespace Bangazon_Workforce_Management.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT Id, Name FROM TrainingProgram";
+                    cmd.CommandText = @"SELECT Id, Name FROM TrainingProgram
+WHERE StartDate > GetDate()";
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     List<TrainingProgram> trainingPrograms = new List<TrainingProgram>();
