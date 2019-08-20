@@ -153,19 +153,52 @@ namespace Bangazon_Workforce_Management.Controllers
         // GET: TrainingPrograms/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            var trainingProgram = GetSingleTrainingProgram(id);
+            DateTime currentDate = DateTime.Now;
+
+            if (trainingProgram.StartDate > currentDate)
+            {
+                return View(trainingProgram);
+            }
+            else
+            {
+                throw new Exception("An Error Occurred");
+            }
         }
+
 
         // POST: TrainingPrograms/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+         public ActionResult Edit(int id, TrainingProgram model)
         {
             try
             {
                 // TODO: Add update logic here
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"UPDATE TrainingProgram
+                                            SET
+                                                Name = @name,
+                                                StartDate = @startDate,
+                                                EndDate = @endDate,
+                                                MaxAttendees = @maxAttendees
+                                            WHERE Id = @id";
+                        cmd.Parameters.AddWithValue("@name", model.Name);
+                        cmd.Parameters.AddWithValue("@startDate", model.StartDate);
+                        cmd.Parameters.AddWithValue("@endDate", model.EndDate);
+                        cmd.Parameters.AddWithValue("@maxAttendees", model.MaxAttendees);
+                        cmd.Parameters.AddWithValue("@id", id);
 
-                return RedirectToAction(nameof(Index));
+                        cmd.ExecuteNonQuery();
+
+                        return RedirectToAction(nameof(Index));
+
+                    }
+                }
             }
             catch
             {
