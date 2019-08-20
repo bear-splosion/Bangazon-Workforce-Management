@@ -41,6 +41,12 @@
             @Html.DisplayFor(model => model.MaxAttendees)
         </dd>
 
+
+    </dl>
+        <div>
+            <h4>Attending Employees</h4>
+            <hr />
+            <dl class="dl-horizontal">
         @foreach (var item in Model.AttendingEmployees)
         {
             if (item.FullName != null)
@@ -52,18 +58,9 @@
                     @Html.DisplayFor(model => item.FullName)
                 </dd>
             }
-            else
-            {
-                <dt>
-                    @Html.DisplayNameFor(model => item.FullName)
-                </dt>
-                <dd>
-                    @Html.DisplayFor(model => item.FullName)
-                </dd>
-            }
-
-        }
-    </dl>
+         }
+            </dl>
+    </div>
 </div>
 <div>
     @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |

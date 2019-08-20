@@ -96,15 +96,17 @@ namespace Bangazon_Workforce_Management.Controllers
 
                     while (reader.Read())
                     {
-                        trainingProgram = new TrainingProgram()
+                        if(trainingProgram == null)
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
-                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
-                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
-                        };
-
+                            trainingProgram = new TrainingProgram()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                                EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                                MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
+                            };
+                        }
                         if(!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
                         {
                             trainingProgram.AttendingEmployees.Add(
