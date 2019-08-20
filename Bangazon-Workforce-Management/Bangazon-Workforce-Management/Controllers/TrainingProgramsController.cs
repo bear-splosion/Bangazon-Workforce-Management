@@ -50,7 +50,7 @@ namespace Bangazon_Workforce_Management.Controllers
                         SELECT Id, Name, StartDate, EndDate, MaxAttendees
                         FROM TrainingProgram
                         WHERE StartDate > GetDate();
-                        ";
+                    ";
                     }
 
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -188,7 +188,7 @@ namespace Bangazon_Workforce_Management.Controllers
             }
             else
             {
-                throw new Exception("An Error Occurred");
+                return RedirectToAction(nameof(Index));
             }
         }
 
@@ -240,7 +240,7 @@ namespace Bangazon_Workforce_Management.Controllers
             return View(program);
         }
 
-        // POST: Instructors/Delete/5
+        // POST: TrainingPrograms/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteTrainingProgram(int id)
