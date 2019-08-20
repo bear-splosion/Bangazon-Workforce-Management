@@ -18,5 +18,7 @@ namespace Bangazon_Workforce_Management.Models
 
         [Display(Name = "Decommissioned")]
         public DateTime? DecomissionDate { get; set; }
+        public int EmployeeId { get; set; }
+        public Employee employee { get; set; }
     }
 }

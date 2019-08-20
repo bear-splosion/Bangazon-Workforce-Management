@@ -305,5 +305,59 @@ namespace Bangazon_Workforce_Management.Controllers
                 }
             }
         }
+
+        // GET: PAST TRAINING PROGRAMS
+        public ActionResult GetPastDates()
+        {
+            var trainingPrograms = new List<TrainingProgram>();
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"
+                        SELECT tp.Id, tp.Name, tp.StartDate, tp.EndDate, tp.MaxAttendees,e.Id AS EmployeeId, e.FirstName, e.LastName
+                        FROM TrainingProgram tp
+                        LEFT JOIN Employee e
+                        ON tp.Id = e.Id
+                        WHERE StartDate < GetDate();
+
+                    ";
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    List<Employee> employees = new List<Employee>();
+
+                    while (reader.Read())
+                    {
+                        TrainingProgram trainingProgram = new TrainingProgram()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                            EndDate = reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                            MaxAttendees = reader.GetInt32(reader.GetOrdinal("MaxAttendees"))
+                        };
+
+                        if(!reader.IsDBNull(reader.GetOrdinal("EmployeeId")))
+                        {
+                            Employee employee = new Employee()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("EmployeeId")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                            };
+                            employees.Add(employee);
+                        }
+                        trainingProgram.AttendingEmployees = employees;
+                        trainingPrograms.Add(trainingProgram);
+                    }
+
+                    reader.Close();
+                }
+            }
+
+            return View(trainingPrograms);
+        }
     }
 }
